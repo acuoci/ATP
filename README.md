@@ -8,4 +8,3 @@ The numerical codes are organized in the following folders:
 1. `lectures`: codes presented and discussed in the ATP lectures
 
 2. `practicals`: codes and problems presented and discussed in the ATP practical sessions
-3. 
