@@ -37,15 +37,11 @@
 %-------------------------------------------------------------------------%
 %                                                                         %
 %  Code: 1D advection-diffusion-reaction by the FD method                 %
-%        solution via the ode45 solver                                    %
+%        solution via the Implicit (or Backward) Euler Method             %
 %                                                                         %
 % ----------------------------------------------------------------------- %
 close all;
 clear variables;
-
-% Global variables (meaning reported below)
-global u gamma alpha beta N h
-
 
 %-------------------------------------------------------------------------%
 % Bar with fixed-temperature boundaries
@@ -63,6 +59,7 @@ U = 10;         % heat exchange coefficient (W/m2/K)
 Tin = 273;      % initial temperature (K)
 N = 50;         % number of grid points (-)
 tf = 600;       % total time (s)
+dt = 2;         % time step (s)
 
 
 %-------------------------------------------------------------------------%
@@ -72,29 +69,68 @@ gamma = lambda/rho/Cp;      % thermal diffusivity (m2/s)
 beta = -U/(rho*Cp)*(4/D);   % source term (1/s)
 alpha = -beta*Tex;          % source term (K/s)
 h = L/(N-1);                % grid spacing (m)
+nsteps = tf/dt;             % number of time steps (-)
 
 
 %-------------------------------------------------------------------------%
-% Solution via ode45 solver
+% Solution via Explicit (or Forward) Euler method
 %-------------------------------------------------------------------------%
-T = [Tleft; ones(N-2,1)*Tin; Tright];
-[t, T] = ode45(@ODESystem, 0:1:tf, T);
+
+% Coefficients
+AE =  u*dt/(2*h) - gamma*dt/h^2;
+AW = -u*dt/(2*h) - gamma*dt/h^2;
+AP = 2*gamma*dt/h^2 - beta*dt;
+
+% Memory allocations
+T = zeros(nsteps,N);
+
+% Initial condition
+T(1,1) = Tleft;
+T(1,2:N-1) = Tin;
+T(1,N) = Tright;
+
+% Assembling Matrix A
+A = zeros(N,N);
+A(1,1) = 1;
+for i=2:N-1
+    A(i,i) = 1+AP;
+end
+for i=2:N-1
+    A(i,i+1) = AE;
+end
+for i=2:N-1
+    A(i,i-1) = AW;
+end
+A(N,N) = 1;
+
+% Assembling vector b
+b = zeros(N,1);
+b(1) = Tleft;
+b(N) = Tright;
+
+% Backward Euler
+for k=1:nsteps-1
+    for i=2:N-1
+        b(i) = alpha*dt + T(k,i);
+    end
+    T(k+1,:) = (A\b)';
+end
 
 
 %-------------------------------------------------------------------------%
 % Video setup
 %-------------------------------------------------------------------------%
-video_name = 'bar_1d_ode45.mp4';
+video_name = 'bar_implicit_euler.mp4';
 videompg4 = VideoWriter(video_name, 'MPEG-4');
 open(videompg4);
 
-for k=1:size(T,1)
+for k=1:1:nsteps
     hold off;
     plot(0:h:L, T(k,:), 'linewidth',2);
     hold on;
     xlabel('axial length [m]');
     ylabel('temperature');    
-    message = sprintf('time=%f', t(k));
+    message = sprintf('time=%f', dt*(k-1));
     time = annotation('textbox',[0.15 0.8 0.1 0.1],'String',message,'EdgeColor','none');
     frame = getframe(gcf);
     writeVideo(videompg4,frame);
@@ -103,33 +139,3 @@ end
 
 % Closing the video stream
 close(videompg4);
-
-
-%-------------------------------------------------------------------------%
-% ODE system
-%-------------------------------------------------------------------------%
-function dT_over_dt = ODESystem(~,T)
-
-    global u gamma alpha beta N h
-
-    dT_over_dt = zeros(N,1);
-
-    % Boundary @ x=0
-    dT_over_dt(1) = 0.;
-
-    % Internal points
-    for i=2:N-1
-
-        dT_over_dx = (T(i+1)-T(i-1))/(2*h);
-        d2T_over_dx2 = (T(i+1)-2.*T(i)+T(i-1))/h^2;
-
-        dT_over_dt(i) = -u*dT_over_dx + ...
-                         gamma*d2T_over_dx2 + ...
-                         alpha + beta*T(i);
-
-    end
-
-    % Boundary @ x=L
-    dT_over_dt(N) = 0.;
-
-end
