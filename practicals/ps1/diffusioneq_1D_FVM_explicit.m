@@ -1,5 +1,47 @@
+% ----------------------------------------------------------------------- %
+%   __  __       _______ _               ____  _  _       _______ _____   %
+%  |  \/  |   /\|__   __| |        /\   |  _ \| || |   /\|__   __|  __ \  %
+%  | \  / |  /  \  | |  | |       /  \  | |_) | || |_ /  \  | |  | |__) | %
+%  | |\/| | / /\ \ | |  | |      / /\ \ |  _ <|__   _/ /\ \ | |  |  ___/  %
+%  | |  | |/ ____ \| |  | |____ / ____ \| |_) |  | |/ ____ \| |  | |      %
+%  |_|  |_/_/    \_|_|  |______/_/    \_|____/   |_/_/    \_|_|  |_|      %
+%                                                                         %
+% ----------------------------------------------------------------------- %
+%                                                                         %
+%   Authors: Alberto Cuoci <alberto.cuoci@polimi.it>                      %
+%            Edoardo Cipriano <edoardo.cipriano@polimi.it>                %
+%   CRECK Modeling Group <http://creckmodeling.chem.polimi.it>            %
+%   Department of Chemistry, Materials and Chemical Engineering           %
+%   Politecnico di Milano                                                 %
+%   P.zza Leonardo da Vinci 32, 20133 Milano                              %
+%                                                                         %
+% ----------------------------------------------------------------------- %
+%                                                                         %
+%   This file is part of Matlab4ATP framework.                            %
+%                                                                         %
+%   License                                                               %
+%                                                                         %
+%   Copyright(C) 2022 Alberto Cuoci                                       %
+%   Matlab4ATP is free software: you can redistribute it and/or           %
+%   modify it under the terms of the GNU General Public License as        %
+%   published by the Free Software Foundation, either version 3 of the    %
+%   License, or (at your option) any later version.                       %
+%                                                                         %
+%   Matlab4CFDofRF is distributed in the hope that it will be useful,     %
+%   but WITHOUT ANY WARRANTY; without even the implied warranty of        %
+%   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         %
+%   GNU General Public License for more details.                          %
+%                                                                         %
+%   You should have received a copy of the GNU General Public License     %
+%   along with Matlab4ATP. If not, see <http://www.gnu.org/licenses/>.    %
+%                                                                         %
+%-------------------------------------------------------------------------%
+%                                                                         %
+%  Code: 1D diffusion equation by the FV method using explicit            %
+%        in time discretization method                                    %
+%                                                                         %
+% ----------------------------------------------------------------------- %
 
-% 1D Diffusion Equations: using FDM and explicit time discretization
 clc; close all; clear;
 
 % ----------------------------------------------------------------------- %

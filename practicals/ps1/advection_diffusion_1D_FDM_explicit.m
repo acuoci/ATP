@@ -1,6 +1,46 @@
-
-% 1D Advection-Diffusionn Equations:
-% using FDM and explicit time discretization
+% ----------------------------------------------------------------------- %
+%   __  __       _______ _               ____  _  _       _______ _____   %
+%  |  \/  |   /\|__   __| |        /\   |  _ \| || |   /\|__   __|  __ \  %
+%  | \  / |  /  \  | |  | |       /  \  | |_) | || |_ /  \  | |  | |__) | %
+%  | |\/| | / /\ \ | |  | |      / /\ \ |  _ <|__   _/ /\ \ | |  |  ___/  %
+%  | |  | |/ ____ \| |  | |____ / ____ \| |_) |  | |/ ____ \| |  | |      %
+%  |_|  |_/_/    \_|_|  |______/_/    \_|____/   |_/_/    \_|_|  |_|      %
+%                                                                         %
+% ----------------------------------------------------------------------- %
+%                                                                         %
+%   Authors: Alberto Cuoci <alberto.cuoci@polimi.it>                      %
+%            Edoardo Cipriano <edoardo.cipriano@polimi.it>                %
+%   CRECK Modeling Group <http://creckmodeling.chem.polimi.it>            %
+%   Department of Chemistry, Materials and Chemical Engineering           %
+%   Politecnico di Milano                                                 %
+%   P.zza Leonardo da Vinci 32, 20133 Milano                              %
+%                                                                         %
+% ----------------------------------------------------------------------- %
+%                                                                         %
+%   This file is part of Matlab4ATP framework.                            %
+%                                                                         %
+%   License                                                               %
+%                                                                         %
+%   Copyright(C) 2022 Alberto Cuoci                                       %
+%   Matlab4ATP is free software: you can redistribute it and/or           %
+%   modify it under the terms of the GNU General Public License as        %
+%   published by the Free Software Foundation, either version 3 of the    %
+%   License, or (at your option) any later version.                       %
+%                                                                         %
+%   Matlab4CFDofRF is distributed in the hope that it will be useful,     %
+%   but WITHOUT ANY WARRANTY; without even the implied warranty of        %
+%   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         %
+%   GNU General Public License for more details.                          %
+%                                                                         %
+%   You should have received a copy of the GNU General Public License     %
+%   along with Matlab4ATP. If not, see <http://www.gnu.org/licenses/>.    %
+%                                                                         %
+%-------------------------------------------------------------------------%
+%                                                                         %
+%  Code: 1D advection-diffusion equation by the FD method                 %
+%        solution using explicit in time discretization method            %
+%                                                                         %
+% ----------------------------------------------------------------------- %
 
 clc; close all; clear;
 
@@ -11,8 +51,9 @@ clc; close all; clear;
 np = 21;             % number of grid points    
 dt = 0.05;          % time step [s]
 nstep = 100;         % number of time steps
+%dt = 0.1*0.1;
 %tottime = 0.5;        % total simulation seconds  
-%nstep = tottime/dt;   % number of time steps
+%nstep = ceil(tottime/dt);   % number of time steps
 L = 2.0;              % domain length [m]
 u = 1;                % velocity [m/s]
 D = 0.05;             % diffusion coefficient [m2/s]
@@ -53,12 +94,12 @@ fprintf('Co=%f, Di=%f, dt=%f, dt(max)=%f\n', Co, Di, dt, dt_max);
 %-------------------------------------------------------------------------%
 % Advancing in time
 %-------------------------------------------------------------------------%
+
 t = 0.;
 for m=1:nstep
     
     % Update the analytical solution
     for i=1:np 
-		% a(i) = A*exp(-4*pi*pi*k*k*D*t)*sin(2*pi*k*(h*(i-1)-u*t)); 
         a(i) = A*exp(-4*pi*pi*k*k*D*t)*sin(2*pi*k*(x(i)-u*t)); 
     end  
     
