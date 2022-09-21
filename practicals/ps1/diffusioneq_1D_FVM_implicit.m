@@ -37,7 +37,7 @@
 %                                                                         %
 %-------------------------------------------------------------------------%
 %                                                                         %
-%  Code: 1D diffusion equation by the FD method using implicit            %
+%  Code: 1D diffusion equation by the FV method using explicit            %
 %        in time discretization method                                    %
 %                                                                         %
 % ----------------------------------------------------------------------- %
@@ -53,17 +53,17 @@ alpha = 0.01;       % Diffusivity coefficient: alpha=k/rho/cp [m2/s]
 L = 1;              % length of the domain [m]
 
 % Build Mesh
-npoints = 20;       % number of points that discretize the 1D domain
-h = L/(npoints-1);  % distance between two consecutive points
+ncells = 20;       % number of cells that discretize the 1D domain
+h = L/ncells;      % distance between two consecutive points
 
-% create a vector with the coordinates of the points
-% this vector is composed of "npoints" evenly spaced from x=0 to x=L
-x = linspace(0,L,npoints);
+% create a vector with the position of the points (face coordinates)
+% the vector is composed of "npoints" evenly spaced from x=0 to x=L
+x = linspace(0,L,ncells+1);
 
 % Time
 tau = 50;                 % total simulation time (high enough to reach steady state) [s]
 dt_diff = 0.5*h^2/alpha;  % Maximum time step that accounts for the diffusion phenomena (from Di=0.5)
-sigma = 2;                % Safety factor to avoid to work exactly at the minimum stability conditions
+sigma = 3;                % Safety factor to avoid to work exactly at the minimum stability conditions
 dt = sigma*dt_diff;       % Choice of the most limiting time step
 
 % Print the computed minimum delta t. %f tells a "floating-point" number
@@ -79,14 +79,18 @@ Tright = 300;       % BC for temperature on the right side of the domain [K]
 Tinit = 300;        % IC for temperature at time=0 [K].
 
 % Memory allocations
-T = ones(size(x))*Tinit;  % Create the temperature fields with dimension = number of points
+T = ones(ncells+2)*Tinit; % Number of cells + 2 ghost cells
+Tplot = zeros(size(x));
 
 % ----------------------------------------------------------------------- %
 % Solution loop
 % ----------------------------------------------------------------------- %
 
+% Re-set index for convenience
+n = ncells + 2;
+
 % Set known terms (known at time t)
-b  = zeros(npoints,1);
+b  = zeros(n,1);
 
 % Build diagonals of the global tridiagonal matrix
 % Ap = central diagonal
@@ -97,14 +101,15 @@ Ae = alpha*dt/h^2;
 Aw = alpha*dt/h^2;
 
 % Create global matrix using sparse in order to avoid to store the "0"s
-A = sparse(npoints,npoints);
+A = sparse(n,n);
 
 % Fill the global matrix using the three diagonals
-A(1,1)=1; A(1,2)=0;                             % From the boundary conditions
-for i=2:npoints-1, A(i,i-1) = Aw; end
-for i=2:npoints-1, A(i,i)   = Ap; end
-for i=2:npoints-1, A(i,i+1) = Ae; end
-A(npoints,npoints)=1; A(npoints,npoints-1)=0;   % From the boundary conditions
+A(1,1)=1; A(1,2)=1;                             % From the boundary conditions
+for i=2:n-1, A(i,i-1) = Aw; end
+for i=2:n-1, A(i,i)   = Ap; end
+for i=2:n-1, A(i,i+1) = Ae; end
+A(n,n)=1; A(n,n-1)=1;   % From the boundary conditions
+
 
 % loop over all the time-steps
 for t=1:nsteps
@@ -112,18 +117,25 @@ for t=1:nsteps
     To = T;  % Store temperature at time t
 
     % Update RHS term using info from the old time step
-    for i=1:npoints
+    for i=2:n-1
         b(i) = -To(i);
     end
-    b(1) = Tleft;
-    b(npoints) = Tright;
+    b(1) = 2*Tleft;
+    b(n) = 2*Tright;
 
     % Solve the linear system of equations
     T = A\b;
 
     % On-The-Fly Post Processing
     if (mod(t,50)==1)   % => Every 50 time steps
-        plot(x,T, "LineWidth", 1.8);      % Plot results
+
+        % Linear interpolation, in order to interpolate cell-centered
+        % temperature values to the face-centered position.
+        for i=1:ncells+1
+            Tplot(i) = 0.5*(T(i+1) + T(i));
+        end
+
+        plot(x,Tplot, "LineWidth", 1.8);      % Plot results
         grid on;                          % Show a grid
         xlabel("length [m]")              % Name of the x axis
         ylabel("Temperature [K]")         % Name of the y axis
@@ -131,3 +143,4 @@ for t=1:nsteps
     end
 
 end
+

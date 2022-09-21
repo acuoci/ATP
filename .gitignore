@@ -34,3 +34,5 @@
 # Media files
 *.mp4
 
+# Mac files
+.DS_store
