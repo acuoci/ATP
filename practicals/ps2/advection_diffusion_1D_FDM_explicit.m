@@ -84,6 +84,8 @@ Di = D*dt/h^2;                      % Diffusion number
 dt_max = min(1*h/u, 0.5*h*h/D);     % Maximum allowed time step
 fprintf('Co=%f, Di=%f, dt=%f, dt(max)=%f\n', Co, Di, dt, dt_max);
 
+dt = 0.8*dt_max;
+
 %-------------------------------------------------------------------------%
 % Video setup
 %-------------------------------------------------------------------------%

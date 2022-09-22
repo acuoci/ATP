@@ -37,7 +37,7 @@
 %                                                                         %
 %-------------------------------------------------------------------------%
 %                                                                         %
-%  Code: 1D diffusion equation by the FV method using explicit            %
+%  Code: 1D diffusion equation by the FV method using implicit            %
 %        in time discretization method                                    %
 %                                                                         %
 % ----------------------------------------------------------------------- %
