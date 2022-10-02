@@ -24,3 +24,4 @@ The advection-diffusion-reaction equation is solved on a 1D domain using the fin
 The advection-diffusion-reaction equation is solved on a 2D rectangular domain using the finite-difference method. Analyically prescribed velocity fields are assumed. Constant and uniform diffusion coefficients are assumed. Spatial derivatives are discretized using 2nd-order, centered schemes.
 * Evaporating pool: [evaporating_pool_2d_ode15s.m](lectures/FDM2D/evaporating_pool_2d_ode15s.m)
 * Tubular reactor: [tubular_reactor_2d_ode15s.m](lectures/FDM2D/tubular_reactor_2d_ode15s.m)
+* Tubular reactor (multiple reactions): [tubular_reactor_2d_multiple_reactions_ode15s.m](lectures/FDM2D/tubular_reactor_2d_multiple_reactions_ode15s.m)
