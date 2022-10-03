@@ -1,3 +1,47 @@
+% ----------------------------------------------------------------------- %
+%   __  __       _______ _               ____  _  _       _______ _____   %
+%  |  \/  |   /\|__   __| |        /\   |  _ \| || |   /\|__   __|  __ \  %
+%  | \  / |  /  \  | |  | |       /  \  | |_) | || |_ /  \  | |  | |__) | %
+%  | |\/| | / /\ \ | |  | |      / /\ \ |  _ <|__   _/ /\ \ | |  |  ___/  %
+%  | |  | |/ ____ \| |  | |____ / ____ \| |_) |  | |/ ____ \| |  | |      %
+%  |_|  |_/_/    \_|_|  |______/_/    \_|____/   |_/_/    \_|_|  |_|      %
+%                                                                         %
+% ----------------------------------------------------------------------- %
+%                                                                         %
+%   Authors: Alberto Cuoci <alberto.cuoci@polimi.it>                      %
+%            Edoardo Cipriano <edoardo.cipriano@polimi.it>                %
+%   CRECK Modeling Group <http://creckmodeling.chem.polimi.it>            %
+%   Department of Chemistry, Materials and Chemical Engineering           %
+%   Politecnico di Milano                                                 %
+%   P.zza Leonardo da Vinci 32, 20133 Milano                              %
+%                                                                         %
+% ----------------------------------------------------------------------- %
+%                                                                         %
+%   This file is part of Matlab4ATP framework.                            %
+%                                                                         %
+%   License                                                               %
+%                                                                         %
+%   Copyright(C) 2022 Alberto Cuoci                                       %
+%   Matlab4ATP is free software: you can redistribute it and/or           %
+%   modify it under the terms of the GNU General Public License as        %
+%   published by the Free Software Foundation, either version 3 of the    %
+%   License, or (at your option) any later version.                       %
+%                                                                         %
+%   Matlab4CFDofRF is distributed in the hope that it will be useful,     %
+%   but WITHOUT ANY WARRANTY; without even the implied warranty of        %
+%   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         %
+%   GNU General Public License for more details.                          %
+%                                                                         %
+%   You should have received a copy of the GNU General Public License     %
+%   along with Matlab4ATP. If not, see <http://www.gnu.org/licenses/>.    %
+%                                                                         %
+%-------------------------------------------------------------------------%
+%                                                                         %
+%  Code: 1D Poisson equation using different methods to accelerate        %
+%        the convergence: Jacobi, Gauss-Seidel, SOR.                      %
+%                                                                         %
+% ----------------------------------------------------------------------- %
+
 % 1D Poisson equation
 % Finite difference method
 clc; close all; clear all;
@@ -6,7 +50,7 @@ clc; close all; clear all;
 L = 1;          % Length of  the domain
 fleft = 0;      % Boundary condition f(x=0) = 0
 fright = 1;     % Boundary Condition f(x=1) = 1
-S = 0;          % source term of the Poisson equation: laplacian(f) = S = 0
+S = 1;          % source term of the Poisson equation: laplacian(f) = S = 0
 
 % Parameters for the iterative solution
 maxiter = 10000;        % Maximum number of iterations to run
@@ -46,7 +90,7 @@ for iter=1:maxiter
     %          = | (f(i+1) + f(i-1) -2*f(i))/h^2 - S | <= tolerance
     res = 0;
     for i=2:nx-1
-        res = res + abs( (f(i+1)+f(i-1)-2*f(i))/h^2 -S );
+        res = res + abs( (f(i+1)+f(i-1)-2*f(i))/h^2 - S );
     end
 
     % Normalize residual with the number of points
