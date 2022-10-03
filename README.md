@@ -38,7 +38,7 @@ The advection-diffusion equation is solved on a 2D rectangular domain using the 
 
 ## 6. Poisson equation in 2D
 The Poisson equation is solved on a 2D rectangular domain using the finite-difference method. A constant source term is initially adopted. Spatial derivatives are discretized using 2nd-order, centered schemes. Different methods are adopted for solving the equation: the Jacobi method, the Gauss-Siedler method, and the Successive Over-Relaxation (SOR) method
-* Matlab script: [poisson_2d.m](codes/finite_difference/poisson_2d.m)
+* Matlab script: [poisson_2d.m](lectures/FDM2D/poisson_2d.m)
 * Matlab live script: [poisson_2d_live.mlx](lectures/FDM2D/poisson_2d_live.mlx)
 
 The same Poisson equation is solved by explicitly assembling the sparse matrix corresponding to the linear system arising after the spatial discretization
