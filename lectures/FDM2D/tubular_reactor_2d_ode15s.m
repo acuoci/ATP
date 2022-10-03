@@ -63,7 +63,7 @@ Ny = 20;            % numebr of grid points along y (-)
 % Sinusoidal inlet concentration
 CinMean = 1;        % inlet concentration (kmol/m3)
 f = 0.025;          % frequency (1/s)    
-A = 0.;             % amplitude (-)
+A = 0.50;             % amplitude (-)
 
 %-------------------------------------------------------------------------%
 % Preprocessing
