@@ -37,7 +37,7 @@
 %                                                                         %
 %-------------------------------------------------------------------------%
 %                                                                         %
-%  Code: 1D advection-diffusion equation by the FD method                 %
+%  Code: 1D advection-diffusion equation by the FV method                 %
 %        solution using explicit in time discretization method            %
 %                                                                         %
 % ----------------------------------------------------------------------- %
@@ -48,8 +48,9 @@ clc; close all; clear;
 % User-defined data
 %-------------------------------------------------------------------------%
 
-np = 51;             % number of grid points    
-dt = 0.05;          % time step [s]
+ncells = 80;         % number of cells
+np = ncells + 1;      % number of grid points
+dt = 0.05;           % time step [s]
 nstep = 100;         % number of time steps
 %dt = 0.5*0.004;
 %tottime = 0.5;        % total simulation seconds  
@@ -65,17 +66,26 @@ k = 1;                % wave number [1/m]
 %-------------------------------------------------------------------------%
 
 % Grid step calculation
-h = L/(np-1);         % grid step [m]
+% h = L/(np-1);         % grid step [m]
+h = L/ncells;         % grid step [m]
 x = linspace(0,L,np);
 
 % Memory allocation
-fo = zeros(np,1);     % temporary numerical solution
-f  = zeros(np,1);      % current numerical solution
-a  = zeros(np,1);      % exact solution
+fo = zeros(ncells+2,1);      % temporary numerical solution
+f  = zeros(ncells+2,1);      % current numerical solution
+fp = zeros(ncells+1,1);      % solution interpolated on the nodes (for plot)
+a  = zeros(ncells+2,1);      % exact solution
+ap = zeros(ncells+1,1);
+
+% Error fields
+eps  = zeros(ncells+2,1);     % Relative error
+L1   = 0.;                    % L1 = volume_integral(eps dV) / volume_integral(dV)
+Linf = 0.;                    % Linf = max (eps)
 
 % Initial solution
-for i=1:np
-	f(i)=A*sin(2*pi*k*h*(i-1)); 
+for i=1:ncells+2
+    xi = (h*(i-2) + 0.5*h);
+    f(i) = A*sin(2*pi*k*xi);
 end
 
 % Check the stability conditions on time step
@@ -101,22 +111,29 @@ t = 0.;
 for m=1:nstep
     
     % Update the analytical solution
-    for i=1:np 
-        a(i) = A*exp(-4*pi*pi*k*k*D*t)*sin(2*pi*k*(x(i)-u*t)); 
-    end  
-    
+    for i=1:ncells+2
+        xi = (h*(i-2) + 0.5*h);
+        a(i) = A*exp(-4*pi*pi*k*k*D*t)*sin(2*pi*k*(xi-u*t));
+    end
+
+    % Interpolate f to nodes
+    for i=1:np
+        fp(i) = 0.5*(f(i+1) + f(i));
+        ap(i) = 0.5*(a(i+1) + a(i));
+    end
+
     % Squared areas below the analytical and numerical solutions
     a2_int = 0.;
     f2_int = 0.;
     for i=1:np-1
-         a2_int = a2_int + h/2*(a(i)^2+a(i+1)^2);
-         f2_int = f2_int + h/2*(f(i)^2+f(i+1)^2);
+         a2_int = a2_int + h/2*(ap(i)^2+ap(i+1)^2);
+         f2_int = f2_int + h/2*(fp(i)^2+fp(i+1)^2);
     end  
     
     % Graphical output
     message = sprintf('time=%d\na^2(int)=%d\ny^2(int)=%d', t, a2_int, f2_int);
-	hold off; plot(0:h:L,f,'linewidth',2); axis([0 L -1, 1]); % plot num. 
-	hold on; plot(0:h:L,a,'r','linewidth',2);                 % plot exact
+	hold off; plot(0:h:L,fp,'linewidth',2); axis([0 L -1, 1]); % plot num. 
+	hold on; plot(0:h:L,ap,'r','linewidth',2);                 % plot exact
     hold on; legend('numerical', 'exact');                    % legend
     xlabel('spatial coordinate [m]');
     ylabel('solution');    
@@ -124,31 +141,62 @@ for m=1:nstep
     frame = getframe(gcf);
     % writeVideo(videompg4,frame);
     delete(time);
-    
-    % Forward Euler method
-    fo=f;   
-    for i=2:np-1
-		f(i) = fo(i)-(u*dt/2/h)*(fo(i+1)-fo(i-1))+...      % advection
-			   D*(dt/h^2)*(fo(i+1)-2*fo(i)+fo(i-1));       % diffusion
-    end 
-    
-    % Periodic boundary condition
-    f(np) = fo(np)-(u*dt/2/h)*(fo(2)-fo(np-1))+...
-            D*(dt/h^2)*(fo(2)-2*fo(np)+fo(np-1)); 
-    f(1)  = f(np);
-    
+
+    % Store old field
+    fo = f;
+
+    % Advance the solution in the internal cells except the last one
+    for i=2:ncells
+        Ai = u/2/h*(fo(i+1) - fo(i-1));
+        Di = D/h^2*(fo(i+1) + fo(i-1) - 2*fo(i));
+        f(i) = fo(i) + dt*(-Ai+Di);
+    end
+
+    % Transport in the last internal cell (@ncells+1) considering cell (@2)
+    % as neighboring cell
+    i = ncells+1; ip1 = 2; im1 = ncells;
+    Ai = u/2/h*(fo(ip1) - fo(im1));
+    Di = D/h^2*(fo(ip1) + fo(im1) - 2*fo(i));
+    f(i) = fo(i) + dt*(-Ai+Di);
+
+    % Find west wall value interpolating (@ncells+1) and (@2)
+    fwall = 0.5*(f(ncells+1) + f(2));
+
+    % Impose the west wall value at the ghost cells for the next iteration
+    f(ncells+2) = 2*fwall - f(ncells+1);
+    f(1)        = 2*fwall - f(2);
+
+    % Interpolate f to nodes
+    for i=1:np
+        fp(i) = 0.5*(f(i+1) + f(i));
+        ap(i) = 0.5*(a(i+1) + a(i));
+    end
+
     % Update the error between numerical and analytical solution
     E = 0;
-    for i=1:np 
-        E = E + (f(i)-a(i))^2;
+    for i=1:np
+        E = E + (fp(i)-ap(i))^2;
     end
     E = h*sqrt(E);
+
+    % Error quantification
+    for i=2:ncells+1
+        eps(i) = abs(f(i) - a(i));
+    end
+
+    L1 = 0; Vol = 0;
+    for i=2:ncells+1
+        L1 = L1 + eps(i)*h^2;
+        Vol = Vol + h^2;
+    end
+    L1 = L1/Vol;
+    Linf = max(eps);
 
     % New time step
     t=t+dt;
        
     % Print the current time (every 25 steps)
-    if (mod(m,25)==1), fprintf('time=%d E=%e\n', t, E); end
+    if (mod(m,25)==1), fprintf('time=%d E=%d L1=%d Linf=%d\n', t, E, L1, Linf); end
 end
 
 fprintf('time=%d E=%e\n', t, E);
