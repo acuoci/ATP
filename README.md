@@ -16,12 +16,30 @@ The advection-diffusion-reaction equation is solved on a 1D domain using the fin
 * Time integration via explicit (forward) Euler method: [bar_1d_explicit_euler.m](lectures/FDM1D/bar_1d_explicit_euler.m)
 * Time integration via implicit (backward) Euler method: [bar_1d_implicit_euler.m](lectures/FDM1D/bar_1d_implicit_euler.m)
 
-## 2. Advection-diffusion-reaction equation in 1D with the Finite Volume (FV) method
+## 2. Advection-diffusion equation in 1D with the Finite Difference (FD) method
+The advection-diffusion equation is solved on a 1D domain using the finite-difference method. Constant, uniform velocity and diffusion coefficients are assumed. The forward (or explicit) Euler method is adopted for the time discretization, while spatial derivatives are discretized using 2nd-order, centered schemes.
+* Matlab script: [advection_diffusion_1d.m](lectures/FDM1D//advection_diffusion_1d.m)
+* Matlab live script: [advection_diffusion_1d_live.mlx](lectures/FDM1D/advection_diffusion_1d_live.mlx)
+
+## 3. Advection-diffusion-reaction equation in 1D with the Finite Volume (FV) method
 The advection-diffusion-reaction equation is solved on a 1D domain using the finite-volume method. Constant, uniform velocity and diffusion coefficients are assumed. Spatial derivatives are discretized using 2nd-order, centered schemes. Time integration is carried out with ode15s solver. Application to a metallic bar with fixed temperatures at the boundaries and possible heat exchange with the external environment.
 * Time integration via ode15s solver: [bar_1d_ode15s.m](lectures/FVM1D/bar_1d_ode15s.m)
 
-## 3. Advection-diffusion-reaction equation in 2D with the Finite Difference (FD) method
+## 4. Advection-diffusion-reaction equation in 2D with the Finite Difference (FD) method
 The advection-diffusion-reaction equation is solved on a 2D rectangular domain using the finite-difference method. Analyically prescribed velocity fields are assumed. Constant and uniform diffusion coefficients are assumed. Spatial derivatives are discretized using 2nd-order, centered schemes.
 * Evaporating pool: [evaporating_pool_2d_ode15s.m](lectures/FDM2D/evaporating_pool_2d_ode15s.m)
 * Tubular reactor: [tubular_reactor_2d_ode15s.m](lectures/FDM2D/tubular_reactor_2d_ode15s.m)
 * Tubular reactor (multiple reactions): [tubular_reactor_2d_multiple_reactions_ode15s.m](lectures/FDM2D/tubular_reactor_2d_multiple_reactions_ode15s.m)
+
+## 5. Advection-diffusion equation in 2D with the Finite Difference (FD) method
+The advection-diffusion equation is solved on a 2D rectangular domain using the finite-difference method. Constant, uniform velocity components and diffusion coefficients are assumed. The forward (or explicit) Euler method is adopted for the time discretization, while spatial derivatives are discretized using 2nd-order, centered schemes.
+* Matlab script: [advection_diffusion_2d.m](lectures/FDM2D/advection_diffusion_2d.m)
+* Matlab live script: [advection_diffusion_2d_live.mlx](lectures/FDM2D/advection_diffusion_2d_live.mlx)
+
+## 6. Poisson equation in 2D
+The Poisson equation is solved on a 2D rectangular domain using the finite-difference method. A constant source term is initially adopted. Spatial derivatives are discretized using 2nd-order, centered schemes. Different methods are adopted for solving the equation: the Jacobi method, the Gauss-Siedler method, and the Successive Over-Relaxation (SOR) method
+* Matlab script: [poisson_2d.m](codes/finite_difference/poisson_2d.m)
+* Matlab live script: [poisson_2d_live.mlx](lectures/FDM2D/poisson_2d_live.mlx)
+
+The same Poisson equation is solved by explicitly assembling the sparse matrix corresponding to the linear system arising after the spatial discretization
+* Matlab script: [poisson_2d_matrix.m](lectures/FDM2D/poisson_2d_matrix.m)
