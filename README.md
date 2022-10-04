@@ -43,3 +43,7 @@ The Poisson equation is solved on a 2D rectangular domain using the finite-diffe
 
 The same Poisson equation is solved by explicitly assembling the sparse matrix corresponding to the linear system arising after the spatial discretization
 * Matlab script: [poisson_2d_matrix.m](lectures/FDM2D/poisson_2d_matrix.m)
+
+## 7. Lorenz equations
+The Lorenz system is a system of ordinary differential equations first studied by mathematician and meteorologist Edward Lorenz. It is notable for having chaotic solutions for certain parameter values and initial conditions. See also: [Lorenz system](https://en.wikipedia.org/wiki/Lorenz_system)
+* Matlab script: [lorenz_equations.m](lectures/turbulence/lorenz_equations.m)
