@@ -48,9 +48,9 @@ clc; close all; clear;
 % User-defined data
 %-------------------------------------------------------------------------%
 
-ncells = 80;         % number of cells
+ncells = 60;         % number of cells
 np = ncells + 1;      % number of grid points
-dt = 0.05;           % time step [s]
+dt = 0.01;           % time step [s]
 nstep = 100;         % number of time steps
 %dt = 0.5*0.004;
 %tottime = 0.5;        % total simulation seconds  

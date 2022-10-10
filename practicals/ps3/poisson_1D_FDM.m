@@ -38,12 +38,10 @@
 %-------------------------------------------------------------------------%
 %                                                                         %
 %  Code: 1D Poisson equation using different methods to accelerate        %
-%        the convergence: Jacobi, Gauss-Seidel, SOR.                      %
+%        the convergence: Jacobi, Gauss-Seidel, SOR. Using FDM.           %
 %                                                                         %
 % ----------------------------------------------------------------------- %
 
-% 1D Poisson equation
-% Finite difference method
 clc; close all; clear all;
 
 % Data
@@ -80,9 +78,9 @@ for iter=1:maxiter
 
     % Loop over all the internal points
     for i=2:nx-1
-        %f(i) = 0.5*(fo(i+1)+fo(i-1)-S*h^2);                     % Jacobi Method
+        f(i) = 0.5*(fo(i+1)+fo(i-1)-S*h^2);                     % Jacobi Method
         %f(i) = 0.5*(f(i+1)+f(i-1)-S*h^2);                       % Gauss-Seidel
-        f(i) = 0.5*beta*(f(i+1)+f(i-1)-S*h^2) + (1-beta)*f(i);  % SOR
+        %f(i) = 0.5*beta*(f(i+1)+f(i-1)-S*h^2) + (1-beta)*f(i);  % SOR
     end
 
     % Compute residual:
