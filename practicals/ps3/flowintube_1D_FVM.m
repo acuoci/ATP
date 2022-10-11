@@ -147,9 +147,9 @@ for is=1:nsteps
         he = hx; hw = hx; dv = hx^2;
 
         Ai = ue^2*he - uw^2*hw;
-        Di = nu*(u(i+1) - u(i))*he - nu*(u(i) - u(i-1))*hw;
+        Di = nu*(u(i+1) - u(i)) - nu*(u(i) - u(i-1));
 
-        ut(i) = u(i) + dt*(-Ai + Di)*dv;
+        ut(i) = u(i) + dt*(-Ai + Di)/dv;
     end
 
     % Boundary Conditions for temporary velocity
@@ -209,7 +209,6 @@ end
 % Plot velocity
 figure;
 plot(x,u,"LineWidth",1.8); xlabel("length [m]"); ylabel("Velocity [m/s]"); % plot velocity
-ylim([0.95 1.05])
 
 % Plot pressure
 figure;

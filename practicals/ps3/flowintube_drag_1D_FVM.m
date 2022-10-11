@@ -148,12 +148,13 @@ for is=1:nsteps
         he = hx; hw = hx; dv = hx^2;
 
         Ai = ue^2*he - uw^2*hw;
-        Di = nu*(u(i+1) - u(i))*he - nu*(u(i) - u(i-1))*hw;
+        % Di = nu*(u(i+1) - u(i))*he - nu*(u(i) - u(i-1))*hw;
+        Di = nu*(u(i+1) - u(i)) - nu*(u(i) - u(i-1));
 
         f = 16/Re; % [DRAG]
         Fdrag = 0.5*u(i)^2*f*(2*hx); % [DRAG]
 
-        ut(i) = u(i) + dt*(-Ai + Di)*dv - dt*Fdrag*dv; %[DRAG]
+        ut(i) = u(i) + dt*(-Ai + Di)/dv - dt*Fdrag/dv; %[DRAG]
     end
 
     % Boundary Conditions for temporary velocity
