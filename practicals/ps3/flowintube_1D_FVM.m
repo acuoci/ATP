@@ -65,7 +65,7 @@ pout = 0;
 % Parameters for SOR
 maxiter = 1000;           % maximum number of iterations
 beta = 1.9;               % SOR coefficient
-tolerance = 1e-6;         % tolerance for convergence of Poisson equation
+tolerance = 1e-12;         % tolerance for convergence of Poisson equation
 
 % ----------------------------------------------------------------------- %
 % Pre-Processing                                                          %
@@ -119,7 +119,7 @@ gamma(nx+2) = 0;
 
 % Initial conditions: set reasonable initial velocity value instead of
 % initializing everything to zero
-u(:) = 1;
+u(:) = 0.95;
 ut = u;
 
 % Parameters for the drag force
@@ -141,8 +141,8 @@ for is=1:nsteps
 
     for i=2:nx
         
-        ue = 0.25*(u(i+1) + u(i))^2;
-        uw = 0.25*(u(i) + u(i-1))^2;
+        ue = 0.5*(u(i+1) + u(i));
+        uw = 0.5*(u(i) + u(i-1));
 
         he = hx; hw = hx; dv = hx^2;
 
