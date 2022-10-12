@@ -41,6 +41,10 @@
 %        FVM discretization. The reaction terms are treated implicitly    %
 %        and they refer to the reactions: A->B->C                         %
 %                                                                         %
+%        RA = -k1*CA^2;                                                   %
+%        RB =  k1*CA^2 - k2*CB;                                           %
+%        RC =  k2*CB;                                                     %
+%                                                                         %
 %-------------------------------------------------------------------------%
 
 clc; clear; close all;
@@ -78,15 +82,16 @@ dt = tau/nsteps;
 % Memory Allocations
 %-------------------------------------------------------------------------%
 
-CA = zeros(1, ncells+2);
-CB = zeros(1, ncells+2);
-CC = zeros(1, ncells+2);
+ZERO = zeros(1, ncells+2);
 
-RA = zeros(1, ncells+2);
-RB = zeros(1, ncells+2);
-RC = zeros(1, ncells+2);
+CA = ZERO; CB = ZERO; CC = ZERO;
+RA = ZERO; RB = ZERO; RC = ZERO;
+JA = ZERO; JB = ZERO; JC = ZERO;
 
 CAo = CA; CBo = CB; CCo = CC;
+
+SAimp = ZERO; SBimp = ZERO; SCimp = ZERO;
+SAexp = ZERO; SBexp = ZERO; SCexp = ZERO;
 
 %-------------------------------------------------------------------------%
 % Solution loop
@@ -114,18 +119,41 @@ for is=1:nsteps
     %---------------------------------------------------------------------%
     
     for i=2:ncells+1
+        % Reaction rates at time t
         RA(i) = -k1*CA(i);
         RB(i) =  k1*CA(i) - k2*CB(i);
         RC(i) =  k2*CB(i);
+
+        % Jacobian at time t
+        JA(i) = -2*k1*CA(i);
+        JB(i) =  2*k1*CA(i) - k2;
+        JC(i) =  k2;
+
+        % Explicit source terms
+        SAexp(i) = RA(i) - JA(i)*CA(i);
+        SBexp(i) = RB(i) - JB(i)*CB(i);
+        SCexp(i) = RC(i) - JC(i)*CC(i);
+
+        % Implicit source terms
+        SAimp(i) = -JA(i);
+        SBimp(i) = -JB(i);
+        SCimp(i) = -JC(i);
     end
 
     %---------------------------------------------------------------------%
     % Solve Advection-Diffusion-Reaction Equations
     %---------------------------------------------------------------------%
 
-    CA = AdvectionDiffusionReaction1D (CA, RA, u, Dmix, dt, h, ncells);
-    CB = AdvectionDiffusionReaction1D (CB, RB, u, Dmix, dt, h, ncells);
-    CC = AdvectionDiffusionReaction1D (CC, RC, u, Dmix, dt, h, ncells);
+    [MA,bA] = AdvectionDiffusionMatrix1D ...
+        (CA, CAin, SAexp, SAimp, u, Dmix, dt, h, ncells);
+    [MB,bB] = AdvectionDiffusionMatrix1D ...
+        (CB, CBin, SBexp, SBimp, u, Dmix, dt, h, ncells);
+    [MC,bC] = AdvectionDiffusionMatrix1D ...
+        (CC, CCin, SCexp, SCimp, u, Dmix, dt, h, ncells);
+
+    CA = MA\bA;
+    CB = MB\bB;
+    CC = MC\bC;
 
     %---------------------------------------------------------------------%
     % Post-Processing
@@ -155,16 +183,16 @@ end
 % Useful functions
 %-------------------------------------------------------------------------%
 
-function C = AdvectionDiffusionReaction1D (C, expS, impS, u, Dmix, dt, h, ncells)
+function [A,b] = AdvectionDiffusionMatrix1D (C, Cin, expS, impS, u, Dmix, dt, h, ncells)
 
     % Build diagonals of the global tridiagonal matrix
     % Ap = central diagonal
     % Ae = upper diagonal
     % Aw = lower diagonal
-    delta = u*dt/h;
+    delta = u*dt/2/h;
     gamma = Dmix*dt/h^2;
 
-    Ap =  1 - 2*gamma;
+    Ap =  1 + 2*gamma;
     Ae =  delta - gamma;
     Aw = -delta - gamma;
 
@@ -172,12 +200,17 @@ function C = AdvectionDiffusionReaction1D (C, expS, impS, u, Dmix, dt, h, ncells
     A = sparse(n,n);
 
     A(1,1) = 1; A(1,2) = 1;
-    for i=2:n-1, A(i,i-1) = Aw; end
-    for i=2:n-1, A(i,i)   = Ap; end
-    for i=2:n-1, A(i,i+1) = Ae; end
-    A(n,n) = 1; A(n,n-1) = 1;
+    for i=2:n-1, A(i,i-1) = Aw;              end
+    for i=2:n-1, A(i,i)   = Ap + impS(i)*dt; end
+    for i=2:n-1, A(i,i+1) = Ae;              end
+    A(n,n) = 1;  A(n,n-1) = -1;
 
-    C = A\b;
+    b = zeros(n);
+    for i=2:ncells+1
+        b(i) = C(i) + expS(i)*dt;
+    end
+    b(1) = 2*Cin;
+    b(ncells+2) = 0.;
 end
 
 function Cface = CellToFaceInterpolation (Ccell, ncells)

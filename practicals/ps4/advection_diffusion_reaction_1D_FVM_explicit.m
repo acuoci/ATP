@@ -41,6 +41,10 @@
 %        FVM discretization. The reaction terms are treated explicitly    %
 %        and they refer to the reactions: A->B->C                         %
 %                                                                         %
+%        RA = -k1*CA^2;                                                   %
+%        RB =  k1*CA^2 - k2*CB;                                           %
+%        RC =  k2*CB;                                                     %
+%                                                                         %
 %-------------------------------------------------------------------------%
 
 clc; clear; close all;
@@ -78,13 +82,10 @@ dt = tau/nsteps;
 % Memory Allocations
 %-------------------------------------------------------------------------%
 
-CA = zeros(1, ncells+2);
-CB = zeros(1, ncells+2);
-CC = zeros(1, ncells+2);
+ZERO = zeros(1, ncells+2);
 
-RA = zeros(1, ncells+2);
-RB = zeros(1, ncells+2);
-RC = zeros(1, ncells+2);
+CA = ZERO; CB = ZERO; CC = ZERO;
+RA = ZERO; RB = ZERO; RC = ZERO;
 
 CAo = CA; CBo = CB; CCo = CC;
 

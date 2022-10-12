@@ -42,6 +42,10 @@
 %        Operator-Splitting approach and solved in a coupled manner       %
 %        using ode45. They refer to the reactions: A->B->C                %
 %                                                                         %
+%        RA = -k1*CA^2;                                                   %
+%        RB =  k1*CA^2 - k2*CB;                                           %
+%        RC =  k2*CB;                                                     %
+%                                                                         %
 %-------------------------------------------------------------------------%
 
 clc; clear; close all;
@@ -165,8 +169,8 @@ function dCidt = odefun (t, y)
 
     CA = y(1); CB = y(2); CC = y(3);
 
-    dCidt(1) = -k1*CA;
-    dCidt(2) =  k1*CA - k2*CB;
+    dCidt(1) = -k1*CA^2;
+    dCidt(2) =  k1*CA^2 - k2*CB;
     dCidt(3) =  k2*CB;
 
     dCidt = dCidt';
