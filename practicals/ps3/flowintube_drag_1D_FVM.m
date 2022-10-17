@@ -52,7 +52,7 @@ clc; clear; close all;
 
 % Problem Data
 Lx = 50;
-nx = 100;
+nx = 50;
 hx  = Lx/nx;
 Ain  = hx^2*pi/4;
 Aout = hx^2*pi/4;
@@ -153,7 +153,7 @@ for is=1:nsteps
         f = 16/Re;                   % [DRAG]
         Fdrag = 0.5*u(i)^2*f*(2*hx); % [DRAG]
 
-        ut(i) = u(i) + dt*(-Ai + Di)/dv - dt*Fdrag/dv; %[DRAG]
+        ut(i) = u(i) + dt*(-Ai + Di)/dv - dt*Fdrag; %[DRAG]
     end
 
     % Boundary Conditions for temporary velocity

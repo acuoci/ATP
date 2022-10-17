@@ -58,14 +58,13 @@ tau = 5;
 ncells = 200;
 u = 1;
 Dmix = 1.e-2;
-k1 = 10;
+k1 = 100;
 k2 = 1;
+sigma = 0.5;
 
 CAin = 1.;
 CBin = 0.;
 CCin = 0.;
-
-nsteps = 10000;
 
 %-------------------------------------------------------------------------%
 % Pre-Processing
@@ -75,8 +74,22 @@ nsteps = 10000;
 h = L/ncells;
 x = linspace(0, L, ncells+1);
 
-% Choose dt for stability
-dt = tau/nsteps;
+% Stability of the fluid dynamics
+dt_Co = 2*Dmix/u^2;
+dt_Di = h^2/2/Dmix;
+
+% Stability of the chemical reactions: 1/max(eigenvalue of the Jacobian)
+J = [-2*k1*CAin  2*k1*CAin  0;  0  -k2  k2;  0  0  0]';
+e = eig(J);
+dt_react = 1/max(abs(e)); 
+
+dt = sigma*min([dt_Co, dt_Di, dt_react]);
+nsteps = tau/dt;
+
+fprintf ("Maximum time step for the species convection = %f\n", dt_Co);
+fprintf ("Maximum time step for the species diffusion  = %f\n", dt_Di);
+fprintf ("Maximum time step for the species reactions  = %f\n", dt_react);
+fprintf ("Selected time step                           = %f\n", dt);
 
 %-------------------------------------------------------------------------%
 % Memory Allocations
