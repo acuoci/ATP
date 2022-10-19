@@ -133,14 +133,14 @@ for is=1:nsteps
     
     for i=2:ncells+1
         % Reaction rates at time t
-        RA(i) = -k1*CA(i);
-        RB(i) =  k1*CA(i) - k2*CB(i);
+        RA(i) = -k1*CA(i)^2;
+        RB(i) =  k1*CA(i)^2 - k2*CB(i);
         RC(i) =  k2*CB(i);
 
         % Jacobian at time t
         JA(i) = -2*k1*CA(i);
-        JB(i) =  2*k1*CA(i) - k2;
-        JC(i) =  k2;
+        JB(i) = -k2;
+        JC(i) = 0;
 
         % Explicit source terms
         SAexp(i) = RA(i) - JA(i)*CA(i);
