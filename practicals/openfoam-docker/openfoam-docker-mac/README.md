@@ -29,7 +29,7 @@ Otherwise, open [this link](https://github.com/acuoci/ATP.git), click on the gre
 Open **terminal** and launch the following commands:
 ```
 cd ~
-cd Development/ATP/practicals/ps5/openfoam-docker-mac
+cd Development/ATP/practicals/openfoam-docker/openfoam-docker-mac
 chmod +x start-openfoam-docker
 ``` 
 Finally, build the image as:
@@ -43,7 +43,7 @@ This operation must be performed just once. The output from these commands shoul
 ## 6. Update Environmental Variables
 The file **start-openfoam-docker** contains the instructions to start openfoam using Docker. Add its path to your environmental variables using the following commands (assuming your terminal is using zsh, which is the default option):
 ```
-echo "export PATH=~/Development/ATP/practicals/ps5/openfoam-docker-mac:$PATH" >> ~/.zshrc
+echo "export PATH=~/Development/ATP/practicals/openfoam-docker/openfoam-docker-mac:$PATH" >> ~/.zshrc
 source ~/.zshrc
 ```
 Also this operation must be performed just once.
@@ -64,3 +64,11 @@ paraview
 Don't worry if the warning `QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-ignore'`  is displayed.
 
 If a new window with a graphical application opens up, then you made it! You can close the paraview window and quit docker with the command `exit`.
+
+## Re-Installation Procedure
+If after any update or problem you need OpenFOAM to be re-installed just repeat the instructions at Point 5.
+
+## Common Problems
+The following problems can be frequently encountered:
+* **Docker daemon not running** - if you encounter the error `docker: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?.` means that you did not open Docker.
+* **Could not connect to any X display.** - if you encounter the error: `Could not connect to any X display.` means that you did not open XQuartz.

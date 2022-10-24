@@ -1,6 +1,0 @@
-#!/bin/zsh
-
-ip=$(ifconfig en0 | grep inet | awk '$1=="inet" {print $2}')
-xhost +$ip
-
-docker run -it --name openfoam4atp  --rm --security-opt seccomp=unconfined -v ~/.Xauthority:/root/.Xauthority -e DISPLAY=$ip:0 -v volOpenFOAM4ATP:/home/openfoam -h openfoam4atp openfoam/openfoam4atp

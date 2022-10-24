@@ -17,13 +17,13 @@ As volume name write **volOpenFOAM4ATP** and create the volume.
 
 ## 3. Install VcXsrv
 On Windows, Download and install [VcXsrv](https://sourceforge.net/projects/vcxsrv/files/latest/download) from the official website. It is a software that allows graphical applications (i.e. Paraview, gnuplot, ecc) to be used from Docker containers. Run *XLaunch* that was installed by VcXsrv, and you will see the following window:
-<img src="./figwin/xlaunch-2.JPG" alt="xl2" width="1200"/>
+<img src="./figwin/xlaunch-2.JPG" alt="xl2" width="600"/>
 Click on Next.
-<img src="./figwin/xlaunch-3.JPG" alt="xl3" width="1200"/>
+<img src="./figwin/xlaunch-3.JPG" alt="xl3" width="600"/>
 Click on Next.
-<img src="./figwin/xlaunch-4.JPG" alt="xl4" width="1200"/>
+<img src="./figwin/xlaunch-4.JPG" alt="xl4" width="600"/>
 <u>Deselect</u> (uncheck) “Native opengl” and <u>Select</u> “Disable access control”. Then click on Next.
-<img src="./figwin/xlaunch-5.JPG" alt="xl5" width="1200"/>
+<img src="./figwin/xlaunch-5.JPG" alt="xl5" width="600"/>
 Click on Finish.
 
 Also XLaunch must be opened every time you need to use OpenFOAM using Docker (or using WSL).
@@ -31,13 +31,13 @@ Also XLaunch must be opened every time you need to use OpenFOAM using Docker (or
 ## 4. Download ATP Repository From GitHub
 Download the ATP repository from github using [this link](https://github.com/acuoci/ATP.git), click on the green button **Code** and **Download Zip**. Unzip the folder and extract the content in a folder called **ATP** on the Desktop. The final path to the installation procedure for windows systems should look like the following:
 ```
-C:\Users\<user_name>\Desktop\ATP\practicals\ps5\openfoam-docker-windows
+C:\Users\<user_name>\Desktop\ATP\practicals\openfoam-docker\openfoam-docker-windows
 ```
 
 ## 5. Install OpenFOAM4ATP Docker Image
 Open **power shell**, which should be installed by default on every Windows machines and launch the following commands:
 ```
-cd $HOME/Desktop/ATP/practicals/ps5/openfoam-docker-windows
+cd $HOME/Desktop/ATP/practicals/openfoam-docker/openfoam-docker-windows
 ``` 
 Finally, build the image as:
 ```
@@ -50,7 +50,7 @@ This operation must be performed just once. Check that the image was correctly i
 ## 6. Run Container [todo]
 Navigate into the **ATP** folder on your Desktop and find the path:
 ```
-C:\Users\<user_name>\Desktop\ATP\practicals\ps5\openfoam-docker-windows
+C:\Users\<user_name>\Desktop\ATP\practicals\openfoam-docker\openfoam-docker-windows
 ```
 From now on, whenever you need to access OpenFOAM through the Docker, just open **Docker** (wait for loading), open **XLaunch**, right-click on the file **start-openfoam-docker.ps1** and choose *Run With PowerShell*.
 
@@ -66,3 +66,11 @@ paraview
 Don't worry if the warning `QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-ignore'`  is displayed.
 
 If a new window with a graphical application opens up, then you made it! You can close the paraview window and quit docker with the command `exit`.
+
+## Re-Installation Procedure
+If after any update or problem you need OpenFOAM to be re-installed just repeat the instructions at Point 5.
+
+## Common Problems
+The following problems can be frequently encountered:
+* **Docker daemon not running** - if you encounter the error `docker: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?.` means that you did not open Docker.
+* **Could not connect to any X display.** - if you encounter the error: `Could not connect to any X display.` means that you did not open XLaunch.
