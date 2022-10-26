@@ -1,5 +1,5 @@
 # OpenFOAM using Docker on MacOS
-Instructions for the installation of OpenFOAM-9 via Docker using a MacOS.
+Instructions for the installation of OpenFOAM-9 via Docker using MacOS.
 
 ## 1. Install Docker
 The first step is the installation of [Docker](https://www.docker.com) from the official website.

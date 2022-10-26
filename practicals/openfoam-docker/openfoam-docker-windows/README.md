@@ -22,7 +22,7 @@ On Windows, Download and install [VcXsrv](https://sourceforge.net/projects/vcxsr
 
 <u>Deselect</u> (uncheck) “Native opengl” and <u>Select</u> “Disable access control”. Then click on Next and Finish.
 
-Also XLaunch must be opened every time you need to use OpenFOAM using Docker (or using WSL).
+Also XLaunch must be open every time you need to use OpenFOAM using Docker (or using WSL).
 
 ## 4. Download ATP Repository From GitHub
 Download the ATP repository from github using [this link](https://github.com/acuoci/ATP.git), click on the green button **Code** and **Download Zip**. Unzip the folder and extract the content in a folder called **ATP** on the Desktop. The final path to the installation procedure for windows systems should look like the following:
@@ -39,7 +39,7 @@ Finally, build the image as:
 ```
 docker build --no-cache -t openfoam/openfoam4atp:latest -f ../Dockerfile .
 ```
-This operation must be performed just once. Check that the image was correctly installed opening the Docker interface, and verifying if an image is present, as in the following figure:
+This operation must be performed just once. Check that the image was correctly installed opening the Docker interface, and verifying that an image is present, as in the following figure:
 
 <img src="./figwin/images.JPG" alt="imges" width="1200"/>
 
@@ -64,7 +64,7 @@ Don't worry if the warning `QStandardPaths: XDG_RUNTIME_DIR not set, defaulting 
 If a new window with a graphical application opens up, then you made it! You can close the paraview window and quit docker with the command `exit`.
 
 ## Re-Installation Procedure
-If after any update or problem you need OpenFOAM to be re-installed just repeat the instructions at Point 5.
+If after any update or problem you need OpenFOAM to be re-installed you should update the content of the ATP folder and repeat the instructions at Point 5.
 
 ## Common Problems
 The following problems can be frequently encountered:
