@@ -1,9 +1,9 @@
 # OpenFOAM using Docker on Windows
-Instructions for the installation of OpenFOAM-7 via Docker using Windows. On Windows two different installation processes can be used. The one reported here exploits Docker in order to use the same procedure for everyone (using mac or pc). Therefore, the instruction reported here is suggested, but if you prefer to use the [classical OpenFOAM installation procedure for Windows](https://openfoam.org/download/windows/) you can (consider that I may not be able to help you for problems specific to this installation procedure).
+Instructions for the installation of OpenFOAM-9 via Docker using Windows. On Windows two different installation processes can be used. The one reported here exploits Docker in order to use the same procedure for everyone (using mac or pc). Therefore, the instruction reported here is suggested, but if you prefer to use the [classical OpenFOAM installation procedure for Windows](https://openfoam.org/download/windows/) you can (consider that I may not be able to help you for problems specific to this installation procedure).
 
 ## 1. Install Docker
 The first step is the installation of [Docker](https://www.docker.com) from the official website.
-Once Docker was installed, open it and make an account if required. Docker must remain open every time you want to use OpenFOAM using this procedure. 
+Once Docker is installed, open it and make an account if required. Docker must remain open every time you want to use OpenFOAM using this procedure. 
 
 In some cases, once Docker is started you will be asked to install WSL 2. In that case, follow the instructions in the link (as shown in the figure).
 
@@ -16,15 +16,11 @@ As volume name write **volOpenFOAM4ATP** and create the volume.
 <img src="./figwin/docker-vol2.png" alt="vol2" width="1200"/>
 
 ## 3. Install VcXsrv
-On Windows, Download and install [VcXsrv](https://sourceforge.net/projects/vcxsrv/files/latest/download) from the official website. It is a software that allows graphical applications (i.e. Paraview, gnuplot, ecc) to be used from Docker containers. Run *XLaunch* that was installed by VcXsrv, and you will see the following window:
-<img src="./figwin/xlaunch-2.JPG" alt="xl2" width="600"/>
-Click on Next.
-<img src="./figwin/xlaunch-3.JPG" alt="xl3" width="600"/>
-Click on Next.
-<img src="./figwin/xlaunch-4.JPG" alt="xl4" width="600"/>
-<u>Deselect</u> (uncheck) “Native opengl” and <u>Select</u> “Disable access control”. Then click on Next.
-<img src="./figwin/xlaunch-5.JPG" alt="xl5" width="600"/>
-Click on Finish.
+On Windows, Download and install [VcXsrv](https://sourceforge.net/projects/vcxsrv/files/latest/download) from the official website. It is a software that allows graphical applications (i.e. Paraview, gnuplot, ecc) to be used from Docker containers. Run *XLaunch* that is installed by VcXsrv, and you will see the following window:
+
+<img src="./figwin/xlaunch.png" alt="xl" width="1200"/>
+
+<u>Deselect</u> (uncheck) “Native opengl” and <u>Select</u> “Disable access control”. Then click on Next and Finish.
 
 Also XLaunch must be opened every time you need to use OpenFOAM using Docker (or using WSL).
 

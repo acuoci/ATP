@@ -1,9 +1,9 @@
 # OpenFOAM using Docker on MacOS
-Instructions for the installation of OpenFOAM-7 via Docker using a MacOS.
+Instructions for the installation of OpenFOAM-9 via Docker using a MacOS.
 
 ## 1. Install Docker
 The first step is the installation of [Docker](https://www.docker.com) from the official website.
-Once Docker was installed, open it and make an account if required. Docker must remain open every time you want to use OpenFOAM using this procedure.
+Once Docker is installed, open it and make an account if required. Docker must remain open every time you want to use OpenFOAM using this procedure.
 
 ## 2. Create a Volume
 Once you installed Docker, open it and click on the icon **Volumes** on the left. Then, click on the blue button **Create**, as in the following figure (ignore the presence of volBasilisk and volOpenFOAM7 in my computer).
@@ -12,7 +12,7 @@ As volume name write **volOpenFOAM4ATP** and create the volume.
 <img src="./figmac/docker-vol2.png" alt="vol2" width="1200"/>
 
 ## 3. Install XQuartz
-On MacOS, Download and install [XQuartz](https://www.xquartz.org) from the official website. It is a software that allows graphical applications (i.e. Paraview, gnuplot, ecc) to be used from Docker containers. Also XQuartz must be open every time you want to use OpenFOAM using this procedure
+On MacOS, Download and install [XQuartz](https://www.xquartz.org) from the official website. It is a software that allows graphical applications (i.e. Paraview, gnuplot, ecc) to be used from Docker containers. Also XQuartz must be open every time you want to use OpenFOAM using this procedure.
 
 ## 4. Download ATP Repository From GitHub
 Search and open the app **terminal** which is installed by default in every MacOS systems. Launch the following commands in order to create a folder called **Development** in your home directory:
@@ -36,7 +36,7 @@ Finally, build the image as:
 ```
 docker build --no-cache -t openfoam/openfoam4atp:latest -f ../Dockerfile .
 ```
-This operation must be performed just once. The output from these commands should look similar to the following figure:
+This operation must be performed just once. The output from these commands should look similar to the following figure but with a bunch of unreadable codes:
 <img src="./figmac/terminal-out-3.png" alt="out3" width="1200"/>
 
 
@@ -57,7 +57,7 @@ From now on, whenever you need to access OpenFOAM through the Docker, just open 
 <img src="./figmac/terminal-out-6.png" alt="out6" width="1200"/>
 
 ## 8. Test
-In order to test that everything was correctly installed, open a terminal and follow the instruction at Point 5 (Run Container). You will enter into the container where you can louch OpenFOAM commands. Try to open the graphical application **Paraview** as follows:
+In order to test that everything was correctly installed, open a terminal and follow the instructions at Point 5 (Run Container). You will enter into an envirnoment where OpenFOAM is installed. Try to open the graphical application **Paraview** as follows:
 ```
 paraview
 ```
@@ -66,7 +66,7 @@ Don't worry if the warning `QStandardPaths: XDG_RUNTIME_DIR not set, defaulting 
 If a new window with a graphical application opens up, then you made it! You can close the paraview window and quit docker with the command `exit`.
 
 ## Re-Installation Procedure
-If after any update or problem you need OpenFOAM to be re-installed just repeat the instructions at Point 5.
+If after any update or problem you need OpenFOAM to be re-installed you should update the content of the ATP folder and repeat the instructions at Point 5.
 
 ## Common Problems
 The following problems can be frequently encountered:
