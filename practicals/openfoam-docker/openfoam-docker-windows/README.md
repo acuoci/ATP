@@ -44,6 +44,12 @@ This operation must be performed just once. Check that the image was correctly i
 <img src="./figwin/images.JPG" alt="imges" width="1200"/>
 
 ## 6. Run Container
+Change the powershell execution permission opening a new powershell window as administrator and type the following command:
+```
+Set-ExecutionPolicy Unrestricted
+```
+Then you can close the powershell window.
+
 Navigate into the **ATP** folder on your Desktop and find the path:
 ```
 C:\Users\<user_name>\Desktop\ATP\practicals\openfoam-docker\openfoam-docker-windows

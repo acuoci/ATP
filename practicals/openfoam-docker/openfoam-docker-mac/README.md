@@ -14,7 +14,7 @@ As volume name write **volOpenFOAM4ATP** and create the volume.
 ## 3. Install XQuartz
 On MacOS, Download and install [XQuartz](https://www.xquartz.org) from the official website. It is a software that allows graphical applications (i.e. Paraview, gnuplot, ecc) to be used from Docker containers. Also XQuartz must be open every time you want to use OpenFOAM using this procedure.
 
-Open XQuartz->Preferences->Security and and Select “Allow connections from network clients” and “Authenticate connections".
+Open XQuartz->Preferences->Security and and Select “Allow connections from network clients” and “Authenticate connections". Then restart XQuartz.
 <img src="./figmac/xquartz-settings.png" alt="xqs" width="1200"/>
 
 ## 4. Download ATP Repository From GitHub
