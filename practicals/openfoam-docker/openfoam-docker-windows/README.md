@@ -76,3 +76,5 @@ If after any update or problem you need OpenFOAM to be re-installed you should u
 The following problems can be frequently encountered:
 * **Docker daemon not running** - if you encounter the error `docker: Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?.` means that you did not open Docker.
 * **Could not connect to any X display.** - if you encounter the error: `Could not connect to any X display.` means that you did not open XLaunch.
+* **Hardware assisted virtualization and data execution protection must be enabled in the BIOS** - if you encounter this error Go to **Setting** > **Update & Security** > **Recovery** (Ripristino) > **Advanced Startup** (Avvio avanzato) and click on **Restart Now**. Once you get the blue screen, select **Troubleshoot** (Risoluzione problemi) > **Advanced Option** > **UEFI Firmware** > **Restart**. Then select **BIOS setup** (for me it was required to press F10), select the section **System configuration**, go down to **Virtualization technology** and switch to **enable**. Then save and exit. It'll restart by itself.
+
