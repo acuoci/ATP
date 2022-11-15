@@ -52,7 +52,7 @@ boundaryField
     {
         type            empty;
     }
-    cylinderPatch
+    cylinder
     {
         type            zeroGradient;
     }

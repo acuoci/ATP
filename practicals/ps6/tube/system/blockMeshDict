@@ -1,3 +1,4 @@
+
 /*--------------------------------*- C++ -*----------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
@@ -13,23 +14,28 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-convertToMeters 1;
+convertToMeters 1.;
+
+Lx	#calc "5.4";
+Ly      #calc "0.9";
+nx      #calc "216";
+ny      #calc "36";
 
 vertices
 (
-    (0  0 0)
-    (8  0 0)
-    (8  1 0)
-    (0  1 0)
-    (0  0 0.025)
-    (8  0 0.025)
-    (8  1 0.025)
-    (0  1 0.025)
+    (0   0     0)
+    ($Lx 0     0)
+    ($Lx $Ly   0)
+    (0   $Ly   0)
+    (0   0     0.1)
+    ($Lx 0     0.1)
+    ($Lx $Ly   0.1)
+    (0   $Ly   0.1)
 );
 
 blocks
 (
-    hex (0 1 2 3 4 5 6 7) (320 40 1) simpleGrading (1 1 1)
+    hex (0 1 2 3 4 5 6 7) ($nx $ny 1) simpleGrading (1 1 1)
 );
 
 edges
@@ -38,24 +44,22 @@ edges
 
 boundary
 (
-	inlet
-	{
-	    type patch;
-	    faces
-	    (
-	        (0 4 7 3)
-	    );
-	}
-	
-	outlet
-	{
-	    type patch;
-	    faces
-	    (
-	        (1 2 6 5)
-	    );
-	}
-
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (0 4 7 3)
+        );
+    }
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (1 5 6 2)
+        );
+    }
     topAndBottom
     {
         type wall;
@@ -64,15 +68,14 @@ boundary
             (0 1 5 4)
             (7 6 2 3)
         );
-    }	
-
+    }
     frontAndBack
     {
         type empty;
         faces
         (
-            (0 3 2 1)
             (4 5 6 7)
+            (0 3 2 1)
         );
     }
 );

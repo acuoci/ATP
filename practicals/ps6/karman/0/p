@@ -35,7 +35,7 @@ boundaryField
         type            zeroGradient;
     }
     
-    cylinderPatch
+    cylinder
     {
         type            zeroGradient;
     }

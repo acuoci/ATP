@@ -8,42 +8,13 @@
 FoamFile
 {
     format      ascii;
-    class       volScalarField;
-    object      p;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -2 0 0 0 0];
+nu              [0 2 -1 0 0 0 0] 1.e-2;
 
-internalField   uniform 0;
-
-boundaryField
-{
-    inlet
-    {
-        type            zeroGradient;
-    }
-    
-    outlet
-    {
-        type            fixedValue;
-        value           uniform 0;
-    }
-
-    topAndBottom
-    {
-        type            zeroGradient;
-    }
-    
-    suzanne
-    {
-        type            zeroGradient;
-    }
-
-    frontAndBack
-    {
-        type            zeroGradient;
-    }
-}
 
 // ************************************************************************* //

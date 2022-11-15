@@ -8,42 +8,43 @@
 FoamFile
 {
     format      ascii;
-    class       volScalarField;
-    object      p;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -2 0 0 0 0];
-
-internalField   uniform 0;
-
-boundaryField
+ddtSchemes
 {
-    inlet
-    {
-        type            zeroGradient;
-    }
-    
-    outlet
-    {
-        type            fixedValue;
-        value           uniform 0;
-    }
-
-    topAndBottom
-    {
-        type            zeroGradient;
-    }
-    
-    suzanne
-    {
-        type            zeroGradient;
-    }
-
-    frontAndBack
-    {
-        type            zeroGradient;
-    }
+    default         Euler;
 }
+
+gradSchemes
+{
+    default         Gauss linear;
+    grad(p)         Gauss linear;
+}
+
+divSchemes
+{
+    default         none;
+    div(phi,U)      Gauss linear;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear orthogonal;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+    default         orthogonal;
+}
+
 
 // ************************************************************************* //

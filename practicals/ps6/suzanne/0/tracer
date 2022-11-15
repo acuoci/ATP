@@ -52,7 +52,7 @@ boundaryField
     {
         type            zeroGradient;
     }
-    cylinderPatch
+    suzanne
     {
         type            zeroGradient;
     }

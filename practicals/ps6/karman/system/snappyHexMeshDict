@@ -36,20 +36,12 @@ addLayers       false;
 // - to specify refinement for any mesh cell intersecting it
 // - to specify refinement for any mesh cell inside/outside/near
 // - to 'snap' the mesh boundary to the surface
-geometry
+geometry // [ATP]
 {
-    cylinder
+    "cylinder-small.stl"   // Provide the name of the stl file in the folder constant/triSurface
     {
         type triSurfaceMesh;
-        file "cylinder-small.stl";
-        
-        regions
-        {
-	    patch0
-            {
-                name cylinderPatch;
-            }
-        }
+	name cylinder;     // Name of the new patch created by the cylinder geometry
     }
 };
 
@@ -87,7 +79,7 @@ castellatedMeshControls
     // Number of buffer layers between different levels.
     // 1 means normal 2:1 refinement restriction, larger means slower
     // refinement.
-    nCellsBetweenLevels 1;
+    nCellsBetweenLevels 4;  // [ATP][Set how smooth the transistion between levels of refinement should be]
 
 
     // Explicit feature edge refinement
@@ -123,24 +115,16 @@ castellatedMeshControls
 
     refinementSurfaces
     { 
-        cylinder
+        cylinder // [ATP]
         {
             // Surface-wise min and max refinement level
-            level (2 2);
+            level (2 2); // [Set the maximum level of refinement]
             
-            regions
-            {
-		cylinder
-                {
-                    level (6 6);
-                }
-            }
-
             // Optional specification of patch type (default is wall). No
             // constraint types (cyclic, symmetry) etc. are allowed.
             patchInfo
             {
-                type patch;
+                type wall;
                 inGroups (meshedPatches);
             }
 
@@ -228,6 +212,8 @@ castellatedMeshControls
     // section reachable from the locationInMesh is kept.
     // NOTE: This point should never be on a face, always inside a cell, even
     // after refinement.
+    // [ATP]
+    // [Mesh the region inside this point. If you select a point inside the cylinder you end up meshing the cylinder instead of outside of it.]
     locationInMesh (2 0.5 0);
 
     // Whether any faceZones (as specified in the refinementSurfaces)

@@ -23,26 +23,18 @@ boundaryField
     {
         type            zeroGradient;
     }
-    
     outlet
     {
         type            fixedValue;
         value           uniform 0;
     }
-
     topAndBottom
     {
         type            zeroGradient;
     }
-    
-    suzanne
-    {
-        type            zeroGradient;
-    }
-
     frontAndBack
     {
-        type            zeroGradient;
+        type            empty;
     }
 }
 
