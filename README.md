@@ -52,5 +52,5 @@ The Lorenz system is a system of ordinary differential equations first studied b
 Numerical solution of a diffusion controlled growth 1D population balance equation using the Discrete Sectional Method (DSM) or the Quadrature Method of  Moments (QMOM).
 * Matlab script (DSM): [dsm_diffusion_controlled_growth.m](lectures/PBE/dsm_diffusion_controlled_growth.m)
 * Matlab script (QMOM): [qmom_diffusion_controlled_growth.m](lectures/PBE/qmom_diffusion_controlled_growth.m)
-* Matlab live script (DSM): [dsm_diffusion_controlled_growth_live.m](lectures/PBE/dsm_diffusion_controlled_growth_live.m)
-* Matlab live script (QMOM): [qmom_diffusion_controlled_growth_live.m](lectures/PBE/qmom_diffusion_controlled_growth_live.m)
+* Matlab live script (DSM): [dsm_diffusion_controlled_growth_live.mlx](lectures/PBE/dsm_diffusion_controlled_growth_live.mlx)
+* Matlab live script (QMOM): [qmom_diffusion_controlled_growth_live.mlx](lectures/PBE/qmom_diffusion_controlled_growth_live.mlx)
