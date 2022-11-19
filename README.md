@@ -47,3 +47,10 @@ The same Poisson equation is solved by explicitly assembling the sparse matrix c
 ## 7. Lorenz equations
 The Lorenz system is a system of ordinary differential equations first studied by mathematician and meteorologist Edward Lorenz. It is notable for having chaotic solutions for certain parameter values and initial conditions. See also: [Lorenz system](https://en.wikipedia.org/wiki/Lorenz_system)
 * Matlab script: [lorenz_equations.m](lectures/turbulence/lorenz_equations.m)
+
+## 8. Population Balance Equations (PBE)
+Numerical solution of a diffusion controlled growth 1D population balance equation using the Discrete Sectional Method (DSM) or the Quadrature Method of  Moments (QMOM).
+* Matlab script (DSM): [dsm_diffusion_controlled_growth.m](lectures/PBE/dsm_diffusion_controlled_growth.m)
+* Matlab script (QMOM): [qmom_diffusion_controlled_growth.m](lectures/PBE/qmom_diffusion_controlled_growth.m)
+* Matlab live script (DSM): [dsm_diffusion_controlled_growth_live.m](lectures/PBE/dsm_diffusion_controlled_growth_live.m)
+* Matlab live script (QMOM): [qmom_diffusion_controlled_growth_live.m](lectures/PBE/qmom_diffusion_controlled_growth_live.m)
