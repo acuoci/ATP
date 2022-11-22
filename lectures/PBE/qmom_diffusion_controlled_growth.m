@@ -97,12 +97,21 @@ nexttile; plot(t, muNorm(:,4)); xlabel('time (s)'); ylabel('\mu_3^{norm}');
 nexttile; plot(t, muNorm(:,5)); xlabel('time (s)'); ylabel('\mu_4^{norm}');
 nexttile; plot(t, muNorm(:,6)); xlabel('time (s)'); ylabel('\mu_5^{norm}');
 
-% Evolution of mean radius
+%% Evolution of mean radius
+%  Analytical results
+for k=1:length(t)
+    muAnalytical1(k) = AnalyticalMoments(1, r, t(k), kG, a, b);
+    muAnalytical2(k) = AnalyticalMoments(2, r, t(k), kG, a, b);
+end
 figure; hold on;
-yyaxis left; plot(t, muNorm(:,2)); ylabel('mean radius (micron)');
-yyaxis right;plot(t, sqrt(muNorm(:,3)-muNorm(:,2).^2)); ylabel('std deviation (micron)');
+yyaxis left; ylabel('mean radius (micron)');
+plot(t, muNorm(:,2)); 
+plot(t, muAnalytical1/muIn(1), 'b--');
+yyaxis right; ylabel('std deviation (micron)');
+plot(t, sqrt(muNorm(:,3)-muNorm(:,2).^2)); 
+plot(t, sqrt(muAnalytical2-muAnalytical1.^2), 'r--');
 xlabel('time (s)'); hold off;
-legend('mean radius', 'std deviation');
+legend('mean radius', 'mean radius (analytical)', 'std deviation', 'std deviation (analytical)');
 
 
 % Plot the distribution function
@@ -136,6 +145,32 @@ fprintf('Time=0 s: rm(micron)=%f sigma(micron)=%f\n', Lm(w,L), StdDev(w,L));
 
 [w, L] = MomentInversion(muNorm(end, :));
 fprintf('Time=20 s: rm(micron)=%f sigma(micron)=%f\n', Lm(w,L), StdDev(w,L));
+
+
+%% Dynamic evolution of density function
+video_name = 'qmom.mp4';
+videompg4 = VideoWriter(video_name, 'MPEG-4');
+open(videompg4);
+
+figure;
+for k=1:length(t)
+     
+     [w, L] = MomentInversion(muNorm(k, :));
+
+     hold off;
+     plot(r, fAnalytical(r, t(k), kG, a, b), 'g');
+     hold on;
+     for i=1:N
+         line([L(i),L(i)], [0 w(i)*muIn(1)]);
+     end
+     hold on;
+     xlabel('r (\mum)'); ylabel('f (#/micron/cm3'); title('time=20 s');
+     legend('numerical','analytical');
+     xlim([0 20]); ylim([0 0.6]);
+     frame = getframe(gcf);
+     writeVideo(videompg4, frame);
+end
+close(videompg4);
 
 
 %% Moment equations
@@ -252,6 +287,19 @@ function f = fAnalytical(r, t, kG, a, b)
         if (arg > 0)
             f(i) = r(i)/sqrt(arg).*fInitial(sqrt(arg), a, b);
         end
+    end
+
+end
+
+
+%% Moments of the analytical solution
+function muk = AnalyticalMoments(k, r, t, kG, a, b)
+
+    muk = 0.;
+    for j=1:length(r)-1
+        deltar = r(j+1)-r(j);
+        Ic = 0.50*(r(j+1)^(k)*fAnalytical(r(j+1), t, kG, a, b)+r(j)^(k)*fAnalytical(r(j), t, kG, a, b));
+        muk = muk + Ic*deltar;
     end
 
 end

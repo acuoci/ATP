@@ -58,7 +58,7 @@ kG = 0.78;  % growth rate constant (mum2/s)
 
 % Domain of integration
 rMax = 30;  % maximum radius (mum)
-M = 200;    % number of intervals
+M = 500;    % number of intervals
 tf = 20;    % maximum time (s)
 
 % Initial distribution (#/cm3/mum)
@@ -72,7 +72,7 @@ for i=1:M
 end
 
 % Solution of discrete section equations
-[t, N] = ode15s(@ODESystem, 0:1:tf, NIn, [], r, kG);
+[t, N] = ode15s(@ODESystem, 0:0.25:tf, NIn, [], r, kG);
 ntimes = length(t);
 
 % Reconstruction of density function (#/cm3/mum)
@@ -104,6 +104,16 @@ fprintf('Time=20 s: Ntot(#/cm3)=%f Rm(micron)=%f\n', mf(1), mf(2));
 
 
 % Evolution of mean radius
+
+%  Analytical results
+muAnalytical1 = zeros(length(t),1);
+muAnalytical2 = zeros(length(t),1);
+for k=1:length(t)
+    muAnalytical1(k) = AnalyticalMoments(1, r, t(k), kG, a, b);
+    muAnalytical2(k) = AnalyticalMoments(2, r, t(k), kG, a, b);
+end
+
+% Numerical results
 m1 = zeros(length(t),1);
 m2 = zeros(length(t),1);
 for i=1:length(t)
@@ -113,10 +123,35 @@ for i=1:length(t)
 end
 
 figure; hold on;
-yyaxis left; plot(t, m1); ylabel('mean radius (micron)');
-yyaxis right;plot(t, sqrt(m2-m1.^2)); ylabel('std deviation (micron)');
+yyaxis left; ylabel('mean radius (micron)');
+plot(t, m1); 
+plot(t, muAnalytical1, 'b--');
+yyaxis right; ylabel('std deviation (micron)');
+plot(t, sqrt(m2-m1.^2)); 
+plot(t, sqrt(muAnalytical2-muAnalytical1.^2), 'r--');
 xlabel('time (s)'); hold off;
-legend('mean radius', 'std deviation');
+legend('mean radius', 'mean radius (analytical)', 'std deviation', 'std deviation (analytical)');
+
+
+%% Dynamic evolution of density function
+video_name = 'dsm.mp4';
+videompg4 = VideoWriter(video_name, 'MPEG-4');
+open(videompg4);
+
+figure;
+for k=1:length(t)
+     hold off;
+     plot(r, fAnalytical(r, t(k), kG, a, b), 'g');
+     hold on;
+     plot(r, f(k,:), 'b');
+     hold on;
+     xlabel('r (\mum)'); ylabel('f (#/micron/cm3'); title('time=20 s'); 
+     xlim([0 20]); ylim([0 0.6]);
+     legend('numerical','analytical');
+     frame = getframe(gcf);
+     writeVideo(videompg4, frame);
+end
+close(videompg4);
 
 
 
@@ -179,6 +214,19 @@ function f = fAnalytical(r, t, kG, a, b)
         if (arg > 0)
             f(i) = r(i)/sqrt(arg).*fInitial(sqrt(arg), a, b);
         end
+    end
+
+end
+
+
+%% Moments of the analytical solution
+function muk = AnalyticalMoments(k, r, t, kG, a, b)
+
+    muk = 0.;
+    for j=1:length(r)-1
+        deltar = r(j+1)-r(j);
+        Ic = 0.50*(r(j+1)^(k)*fAnalytical(r(j+1), t, kG, a, b)+r(j)^(k)*fAnalytical(r(j), t, kG, a, b));
+        muk = muk + Ic*deltar;
     end
 
 end
