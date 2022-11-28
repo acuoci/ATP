@@ -8,55 +8,42 @@
 FoamFile
 {
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      tracer;
+    class       volVectorField;
+    object      U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 0 0 0 0];
+dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform 0;
+internalField   uniform (0 0 0);
 
 boundaryField
 {
     inlet
     {
-        type            codedFixedValue;
-        value           uniform 0;
-        
-        name            codedPatchBC;
-        
-        code
-        #{
-            const fvPatch& patch = this->patch();
-            const vectorField& cf = patch.Cf();
-            
-            scalarField& field = *this;
-            forAll(cf, i)
-            {
-                field[i] = (cf[i].y() <= 0.5) ? 1. : 0.;
-            }
-
-        #};
+        type            fixedValue;
+        value           uniform (10 0 0);
     }
+
     outlet
     {
         type            zeroGradient;
     }
-    topAndBottom
+
+    upperWall
     {
-        type            zeroGradient;
+        type            noSlip;
     }
+
+    lowerWall
+    {
+        type            noSlip;
+    }
+
     frontAndBack
     {
         type            empty;
     }
-    cylinder
-    {
-        type            zeroGradient;
-    }
 }
-
 
 // ************************************************************************* //

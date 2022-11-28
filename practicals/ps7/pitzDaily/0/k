@@ -8,42 +8,42 @@
 FoamFile
 {
     format      ascii;
-    class       volVectorField;
-    object      U;
+    class       volScalarField;
+    location    "0";
+    object      k;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 1 -1 0 0 0 0];
+dimensions      [0 2 -2 0 0 0 0];
 
-internalField   uniform (7.2 0 0);
+internalField   uniform 0.375;
 
 boundaryField
 {
     inlet
     {
         type            fixedValue;
-        value           uniform (7.2 0 0);
+        value           uniform 0.375;
     }
-    
     outlet
     {
         type            zeroGradient;
     }
-
-    topAndBottom
+    upperWall
     {
-        type            slip;
+        type            kqRWallFunction;
+        value           uniform 0.375;
     }
-
-    cylinder
+    lowerWall
     {
-        type            noSlip;
+        type            kqRWallFunction;
+        value           uniform 0.375;
     }
-
     frontAndBack
     {
         type            empty;
     }
 }
+
 
 // ************************************************************************* //
