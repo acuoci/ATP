@@ -36,14 +36,12 @@
 %                                                                         %
 %-------------------------------------------------------------------------%
 %                                                                         %
-%  Code: Population Balance Equation (PBE) with growth term only          %
-%        Solved using the Discrete Sectional Method                       %
-%        R. McGraw (1997) Description of Aerosol Dynamics by the          %
-%        Quadrature Method of Moments, Aerosol Science and Technology,    %
-%        27:2, 255-265 (1997), DOI: 10.1080/02786829708965471             %
+%  Code: Population Balance Equation (PBE) with growth term and           %
+%        breakage sink and source terms. Particles with radius            %
+%        greater than r0 are destroyed forming two particles with         %
+%        half the radius of the destroyed particle.                       %
 %                                                                         %
 % ----------------------------------------------------------------------- %
-
 close all;
 clear variables;
 
@@ -56,11 +54,11 @@ b = 0.60;   % (1/mum)
 % Domain of integration
 % rMax = 30;  % maximum radius (mum)
 % M = 500;    % number of intervals
-rMax = 120;  % maximum radius (mum)
-M = 1000;    % number of intervals
-tf = 20;    % maximum time (s)
-r0 = 6;
-kG = 1.e-2;  % growth rate constant (mum2/s)
+rMax = 120;   % maximum radius (mum)
+M = 1000;     % number of intervals
+tf = 20;      % maximum time (s)
+r0 = 12;      % radius at which particles are broken
+kG = 1.e-1;   % rate of breakage
 
 % Initial distribution (#/cm3/mum)
 r = 0:rMax/M:rMax;
@@ -81,14 +79,14 @@ for i=1:ntimes
     f(i, 2:end) = N(i,:)./(r(2:end)-r(1:end-1));
 end
 
-
 % Dynamic evolution of density function
 figure;
 for k=1:length(t)
      hold off;
      plot(r, f(k,:), 'b');
      hold on;
-     xlabel('r (\mum)'); ylabel('f (#/micron/cm3)'); title('time=20 s'); 
+     xlabel('r (\mum)'); ylabel('f (#/micron/cm3)');
+     titlestring = strcat('time= ', num2str(t(k), '%.2f'), ' s'); title (titlestring);
      xlim([0 20]); ylim([0 0.6]);
      xline(r0);
      legend('numerical');
@@ -99,6 +97,7 @@ end
 function dN = ODESystem(~, N, r, kG, r0)
 
     M = length(N);
+    Ldot = 0.68;
 
     f = zeros(M+1,1);
     for i=1:M
@@ -108,21 +107,19 @@ function dN = ODESystem(~, N, r, kG, r0)
     integ = 0;
     for i=1:M
         rh = 0.5*(r(i+1) + r(i));
-        integ = integ + kG*heaviside(rh-r0)*N(i);
+        integ = integ + 2*kG*heaviside(rh-r0)*N(i);
     end
 
     dN = zeros(M,1);
-    dN(1) = -f(2);
-    % dN(1) = 0.;
+    dN(1) = -Ldot*f(2) + integ*dirac(0.5*r0, r(2), r(1)) - kG*heaviside(rh-r0)*N(1);
     for i=2:M-1
         rh = 0.5*(r(i+1) + r(i));
-        % dN(i) = -f(i+1) + f(i) ...
-        dN(i) = 0 ...
+        % dN(i) = 0 ...
+        dN(i) = -Ldot*f(i+1) + Ldot*f(i) ...
             + integ*dirac(0.5*r0, r(i+1), r(i)) ...
-            - kG*heaviside(rh-r0)*f(i+1)/(r(i+1) - r(i));
+            - kG*heaviside(rh-r0)*N(i);
     end
-    dN(M) = f(M);
-    % dN(M) = 0.;
+    dN(M) = Ldot*f(M) + integ*dirac(0.5*r0, r(M), r(M-1)) - kG*heaviside(rh-r0)*N(M);
 end
 
 function delta = dirac(r0, rr, rl)

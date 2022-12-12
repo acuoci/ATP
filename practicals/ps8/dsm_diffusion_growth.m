@@ -86,7 +86,8 @@ for k=1:length(t)
      hold off;
      plot(r, f(k,:), 'b');
      hold on;
-     xlabel('r (\mum)'); ylabel('f (#/micron/cm3)'); title('time=20 s'); 
+     xlabel('r (\mum)'); ylabel('f (#/micron/cm3)');
+     titlestring = strcat('time= ', num2str(t(k), '%.2f'), ' s'); title (titlestring);
      xlim([0 20]); ylim([0 0.6]);
      legend('numerical');
      frame = getframe(gcf);
@@ -117,7 +118,5 @@ end
 
 % Initial solution
 function f = fInitial(r, a, b)
-
     f = a*(r.^2).*exp(-b*r);
-
 end

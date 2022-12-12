@@ -36,11 +36,10 @@
 %                                                                         %
 %-------------------------------------------------------------------------%
 %                                                                         %
-%  Code: Population Balance Equation (PBE) with growth term only          %
-%        Solved using the Discrete Sectional Method                       %
-%        R. McGraw (1997) Description of Aerosol Dynamics by the          %
-%        Quadrature Method of Moments, Aerosol Science and Technology,    %
-%        27:2, 255-265 (1997), DOI: 10.1080/02786829708965471             %
+%  Code: Population Balance Equation (PBE) with growth term and           %
+%        breakage sink term which destroys particles with age             %
+%        greater than tau0. When we destroy a particle we form            %
+%        two new particles with age (tau) zero.                           %
 %                                                                         %
 % ----------------------------------------------------------------------- %
 
@@ -48,47 +47,46 @@ close all;
 clear variables;
 
 % Initial distribution: f=a*r^2*exp(-b*r)
-% r = particle radius (mum)
 % a and b: distribution parameters
 a = 0.108;  % (1/mum/cm3)
 b = 0.60;   % (1/mum)
 
 % Domain of integration
-% rMax = 30;  % maximum radius (mum)
-% M = 500;    % number of intervals
-rMax = 120;  % maximum radius (mum)
-M = 1000;    % number of intervals
-tf = 20;    % maximum time (s)
-r0 = 16;
-kG = 1.e-2;  % growth rate constant (mum2/s)
+tauMax = 120;  % maximum radius (mum)
+M = 1000;      % number of intervals
+tf = 200;      % maximum time (s)
+tau0 = 70;     % age at which cells are broken
+kG = 1.e-0;    % rate of breakage
 
 % Initial distribution (#/cm3/mum)
-r = 0:rMax/M:rMax;
-fIn = fInitial(r,a,b);
+tau = 0:tauMax/M:tauMax;
+fIn = fInitial(tau,a,b);
 
 % Number of particles (per unit of volume) in each interval (#/cm3)
 NIn = zeros(M,1);
 for i=1:M
-    NIn(i) = fIn(i+1)*(r(i+1)-r(i));
+    NIn(i) = fIn(i+1)*(tau(i+1)-tau(i));
 end
 
-[t, N] = ode15s(@ODESystem, 0:0.25:tf, NIn, [], r, kG, r0);
+[t, N] = ode15s(@ODESystem, 0:0.25:tf, NIn, [], tau, kG, tau0);
 ntimes = length(t);
 
 % Reconstruction of density function (#/cm3/mum)
 f = zeros(ntimes, M+1);
 for i=1:ntimes
-    f(i, 2:end) = N(i,:)./(r(2:end)-r(1:end-1));
+    f(i, 2:end) = N(i,:)./(tau(2:end)-tau(1:end-1));
 end
 
 % Dynamic evolution of density function
 figure;
 for k=1:length(t)
      hold off;
-     plot(r, f(k,:), 'b');
+     plot(tau, f(k,:), 'b');
      hold on;
-     xlabel('r (\mum)'); ylabel('f (#/micron/cm3)'); title('time=20 s'); 
-     xlim([0 20]); ylim([0 0.6]);
+     xlabel('r (\mum)'); ylabel('f (#/micron/cm3)');
+     titlestring = strcat('time= ', num2str(t(k), '%.2f'), ' s'); title (titlestring);
+     xlim([0 120]); ylim([0 0.6]);
+     xline(tau0);
      legend('numerical');
      frame = getframe(gcf);
 end
@@ -106,7 +104,7 @@ function dN = ODESystem(~, N, r, kG, r0)
     fBc = 0.;
     for i=1:M
         rh = 0.5*(r(i+1) + r(i));
-        fBc = fBc + 2*kG*heaviside(rh-r0)*f(i+1)/(r(i+1) - r(i));
+        fBc = fBc + 2*kG*heaviside(rh-r0)*N(i);
     end
 
     dN = zeros(M,1);
@@ -114,11 +112,11 @@ function dN = ODESystem(~, N, r, kG, r0)
     for i=2:M-1
         rh = 0.5*(r(i+1) + r(i));
         dN(i) = -f(i+1) + f(i) ...
-            - kG*heaviside(rh-r0)*f(i+1)/(r(i+1) - r(i));
+            - kG*heaviside(rh-r0)*N(i);
     end
-    % dN(M) = f(M);
+
     rh = 0.5*(r(M+1) + r(M));
-    dN(M) = f(M) - kG*heaviside(rh-r0)*f(M+1)/(r(M+1) - r(M));
+    dN(M) = f(M) - kG*heaviside(rh-r0)*N(M);
 end
 
 % Initial solution

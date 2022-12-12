@@ -36,11 +36,10 @@
 %                                                                         %
 %-------------------------------------------------------------------------%
 %                                                                         %
-%  Code: Population Balance Equation (PBE) with growth term only          %
-%        Solved using the Discrete Sectional Method                       %
-%        R. McGraw (1997) Description of Aerosol Dynamics by the          %
-%        Quadrature Method of Moments, Aerosol Science and Technology,    %
-%        27:2, 255-265 (1997), DOI: 10.1080/02786829708965471             %
+%  Code: Population Balance Equation (PBE) with growth term only and      %
+%        with the solution of a continuous variable, where the growth     %
+%        rate is a function of that continuous variable.                  %
+%        Solved using the Discrete Sectional Method.                      %
 %                                                                         %
 % ----------------------------------------------------------------------- %
 
@@ -72,7 +71,7 @@ for i=1:M
 end
 
 % Continous phase variables
-Y0 = 0;
+Y0 = 10;
 
 % Setup initial conditions for ODE system
 Y = Y0;
@@ -97,7 +96,8 @@ for k=1:length(t)
      hold off;
      plot(r, f(k,:), 'b');
      hold on;
-     xlabel('r (\mum)'); ylabel('f (#/micron/cm3)'); title('time=20 s'); 
+     xlabel('r (\mum)'); ylabel('f (#/micron/cm3)');
+     titlestring = strcat('time= ', num2str(t(k), '%.2f'), ' s'); title (titlestring);
      xlim([0 20]); ylim([0 0.6]);
      legend('numerical');
      frame = getframe(gcf);
@@ -106,7 +106,7 @@ end
 % Dynamic of the continuous variable
 figure;
 plot (t,N(:,end));
-xlabel('r (\mum)'); ylabel('Y'); title('time=20 s');
+xlabel('time [s]'); ylabel('Y');
 
 % Equations 
 function dN = ODESystem(~, N, r, kG)
@@ -132,19 +132,16 @@ function dN = ODESystem(~, N, r, kG)
     for i=1:M
         sumNint = sumNint + N(i);
     end
-    dN(M+1) = Ldot(kG, r(i+1), Y)*sumNint;
+    dN(M+1) = -Ldot(kG, r(i+1), Y)*sumNint;
 end
 
 % Growth rate function
 function Lprime = Ldot(kG, r, Y)
-    % Lprime = kG/r;
-    Lprime = kG*(5. - Y);
+    Lprime = kG*(Y - 1.);
 end
 
 % Initial solution
 function f = fInitial(r, a, b)
-
     f = a*(r.^2).*exp(-b*r);
-
 end
 
