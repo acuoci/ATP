@@ -65,7 +65,6 @@ tau = 50;                 % total simulation time (high enough to reach steady s
 dt_diff = 0.5*h^2/alpha;  % Maximum time step that accounts for the diffusion phenomena (from Di=0.5)
 sigma = 1.;                % Safety factor to avoid to work exactly at the minimum stability conditions
 dt = sigma*dt_diff;       % Choice of the most limiting time step
-dt = 0.001;
 
 % Print the computed minimum delta t. %f tells a "floating-point" number
 % has to be printed. \n goes to the next line
@@ -94,7 +93,6 @@ T(npoints) = Tright;  % The last point corresponds to the right boundary, where 
 for t=1:nsteps
 
     To = T;  % Store temperature at time t
-    T(end) = T(end-1);
 
     % Loop over all the internal points. The boundary points where already
     % solved setting the boundary conditions
