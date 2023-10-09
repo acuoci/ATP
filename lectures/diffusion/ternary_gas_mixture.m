@@ -67,7 +67,7 @@ D = [ 0       8.33e-5 6.80e-5; ...
       6.80e-5 1.68e-5 0        ];
 
 % Experimental data
-expdata = dlmread("ExpDuncanToor.out",'', 1);
+expdata = dlmread("ExpDuncanToor.exp",'', 1);
 
 %-------------------------------------------------------------------------%
 % Pre-processing
