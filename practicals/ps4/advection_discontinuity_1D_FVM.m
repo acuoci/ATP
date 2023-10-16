@@ -147,10 +147,17 @@ for m=1:nstep
         uds.Ai = u/h*(uds.fo(i) - uds.fo(i-1));                 % upwind
 
         % Advection term using flux limiters
+        if ((flm.fo(i) - flm.fo(i-1)) == 0)
+            rE = 0.;
+            rW = 0.;
+        else
+            rE = (flm.fo(i+1) - flm.fo(i))/(flm.fo(i) - flm.fo(i-1));
+            rW = rE;
+        end
         rE = r (flm.fo, i);
         rW = r (flm.fo, i-1);
-        psiE = psi_minmod (rE);
-        psiW = psi_minmod (rW);
+        psiE = psi_muscl (rE);
+        psiW = psi_muscl (rW);
         fE = flm.fo(i) + 0.5*psiE*(flm.fo(i) - flm.fo(i-1));
         if (i-1 == 1)
             fW = flm.fo(i);
@@ -176,9 +183,13 @@ end
 
 function ri = r(f, i)
     if (i == 1)
-        ri = 1;
+        ri = 0;
     else
-        ri = (f(i+1) - f(i))/(f(i) - f(i-1));
+        if ((f(i) - f(i-1)) == 0)
+            ri = 0.;
+        else
+            ri = (f(i+1) - f(i))/(f(i) - f(i-1));
+        end
     end
 end
 
