@@ -37,8 +37,8 @@
 %                                                                         %
 %-------------------------------------------------------------------------%
 %                                                                         %
-%  Code: 1D advection equation for a discontinuous field using FVM        %
-%        testing different advection schemes and flux limiters.           %
+%  Code: 1D advection diffusion equation using FVM and a time implicit    %
+%        discretization of the time derivative.                           %
 %                                                                         %
 % ----------------------------------------------------------------------- %
 
@@ -50,7 +50,7 @@ clc; close all; clear;
 
 ncells = 500;           % number of cells
 np = ncells + 1;        % number of grid points
-L = 5.0;                % domain length [m]
+L = 5;                  % domain length [m]
 u = 1;                  % velocity [m/s]
 D = 0.;                 % diffusion coefficient [m2/s]
 tau = 1.5;              % total simulation time [s]
@@ -65,137 +65,80 @@ fright = 1.;            % right side boundary value
 h = L/ncells;           % grid step [m]
 x = linspace(0,L,np);
 
+% Check the stability conditions on time step
+dt_max = 1*h/u;
+sigma = 2;
+dt = sigma*dt_max;
+nstep = tau/dt;
+
 % Memory allocation
-cds.f  = zeros (ncells+2, 1);
-cds.fo = zeros (ncells+2, 1);
-cds.fp = zeros (ncells+1, 1);
-
-uds.f  = zeros (ncells+2, 1);
-uds.fo = zeros (ncells+2, 1);
-uds.fp = zeros (ncells+1, 1);
-
-flm.f  = zeros (ncells+2, 1);
-flm.fo = zeros (ncells+2, 1);
-flm.fp = zeros (ncells+1, 1);
+f  = zeros (ncells+2, 1);
+fo = zeros (ncells+2, 1);
+fp = zeros (ncells+1, 1);
 
 % Initial solution
 for i=1:ncells+2
     xi = (h*(i-2) + 0.5*h);
     if (xi > 0.5*L)
-        cds.f(i) = 1.;
-        uds.f(i) = 1.;
-        flm.f(i) = 1.;
+        f(i) = 1.;
     else
-        cds.f(i) = 2.;
-        uds.f(i) = 2.;
-        flm.f(i) = 2.;
+        f(i) = 2.;
     end
 end
 
-% Check the stability conditions on time step
-dt_max = 1*h/u;
-sigma = 0.01;
+% Create Matrix A
+n = ncells + 2;
 
-dt = sigma*dt_max;
-nstep = tau/dt;
+% Known terms vector
+b = zeros (ncells+2, 1);
 
-%-------------------------------------------------------------------------%
-% Advancing in time
-%-------------------------------------------------------------------------%
+% Build diagonals of the global tridiagonal matrix
+alpha = u*dt/h;
+beta  = D/h^2;
+Ap = -2*beta - alpha - 1;
+Ae = beta;
+Aw = beta + alpha;
 
-t = 0.;
-for m=1:nstep
+% Create global matrix using sparse in order to avoid to store the "0"s
+A = sparse (ncells+2, ncells+2);
 
-    % Interpolate f to nodes
-    for i=1:np
-        cds.fp(i) = 0.5*(cds.f(i+1) + cds.f(i));
-        uds.fp(i) = 0.5*(uds.f(i+1) + uds.f(i));
-        flm.fp(i) = 0.5*(flm.f(i+1) + flm.f(i));
+% Fill the global matrix using the three diagonals
+A(1,1)=1; A(1,2)=1;                         % From the boundary conditions
+for i=2:ncells+1, A(i,i-1) = Aw; end
+for i=2:ncells+1, A(i,i) = Ap;   end
+for i=2:ncells+1, A(i,i+1) = Ae; end
+A(n,n)=1; A(n,n-1)=1;                       % From the boundary conditions
+
+% loop over all the time steps
+for t=1:nstep
+    
+    % Store solution at the old time step
+    fo = f;
+
+    % Update RHS term using info from the old time step
+    for i=2:ncells+1
+        b(i) = -fo(i);
     end
+    b(1) = 2*fleft;
+    b(ncells+2) = 2*fright;
 
-    % Graphical output
-    if (mod(m,100)==0 || m==1)
+    % Solve the linear system of equations
+    f = A\b;
+
+    % Plot results
+    if (mod(t,1) == 0 || t == 1)
+        
+        % Linear interpolation, in order to interpolate cell-centered
+        % temperature values to the face-centered position.
+        for i=1:ncells+1
+            fp(i) = 0.5*(f(i+1) + f(i));
+        end
+
         hold off;
-        plot (x, cds.fp, "LineWidth", 2); hold on;
-        plot (x, uds.fp, "LineWidth", 2); hold on;
-        plot (x, flm.fp, "LineWidth", 2);
-        legend (["centered", "upwind", "flux limiter"]);
-        title ('Impact of the Advection Scheme on the transport of a discontinuity');
-        xlabel('spatial coordinate [m]');
-        ylabel('solution');
+        plot (x, fp, "LineWidth", 2);
         grid on;
+        xlabel ("length [m]");
+        ylabel ("Solution");
         drawnow;
     end
-
-    % Store old field
-    cds.fo = cds.f;
-    uds.fo = uds.f;
-    flm.fo = flm.f;
-
-    % Impose the west and east wall values using ghost cells
-    cds.f(1) = 2.*fleft - cds.f(2);
-    uds.f(1) = 2.*fleft - uds.f(2);
-    flm.f(1) = 2.*fleft - flm.f(2);
-
-    cds.f(ncells+2) = 2.*fright - cds.f(ncells+1);
-    uds.f(ncells+2) = 2.*fright - uds.f(ncells+1);
-    flm.f(ncells+2) = 2.*fright - flm.f(ncells+1);
-
-    % Advance the solution in the internal cells except the last one
-    for i=2:ncells+1
-        cds.Ai = u/2/h*(cds.fo(i+1) - cds.fo(i-1));             % centered
-        uds.Ai = u/h*(uds.fo(i) - uds.fo(i-1));                 % upwind
-
-        % Advection term using flux limiters
-        rE = r (flm.fo, i);
-        rW = r (flm.fo, i-1);
-        psiE = psi_minmod (rE);
-        psiW = psi_minmod (rW);
-        fE = flm.fo(i) + 0.5*psiE*(flm.fo(i) - flm.fo(i-1));
-        if (i-1 == 1)
-            fW = flm.fo(i);
-        else
-            fW = flm.fo(i-1) + 0.5*psiW*(flm.fo(i-1) - flm.fo(i-2));
-        end
-        flm.Ai = u/h*(fE - fW);
-
-        cds.Di = D/h^2*(cds.fo(i+1) + cds.fo(i-1) - 2*cds.fo(i));
-        uds.Di = D/h^2*(uds.fo(i+1) + uds.fo(i-1) - 2*uds.fo(i));
-        flm.Di = D/h^2*(flm.fo(i+1) + flm.fo(i-1) - 2*flm.fo(i));
-
-        cds.f(i) = cds.fo(i) + dt*(-cds.Ai + cds.Di);
-        uds.f(i) = uds.fo(i) + dt*(-uds.Ai + uds.Di);
-        flm.f(i) = flm.fo(i) + dt*(-flm.Ai + flm.Di);
-    end
-
-    % New time step
-    t=t+dt;       
-end
-
-%-- Helper functions
-
-function ri = r(f, i)
-    if (i == 1)
-        ri = 1;
-    else
-        ri = (f(i+1) - f(i))/(f(i) - f(i-1));
-    end
-end
-
-% Flux limiters: see pag. 96 Ferziger-Peric for more
-
-function psi = psi_minmod (r)
-    psi = max (0, min (r, 1));
-end
-
-function psi = psi_vanleer (r)
-    psi = (r + abs(r))/(1 + abs(r));
-end
-
-function psi = psi_muscl (r)
-    psi = max (0., min ([2, 2*r, 0.5*(1+r)]));
-end
-
-function psi = psi_superbee (r)
-    psi = max ([0, min(2*r, 1), min(r, 2)]);
 end
