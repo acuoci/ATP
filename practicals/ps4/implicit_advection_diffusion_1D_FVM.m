@@ -94,7 +94,7 @@ b = zeros (ncells+2, 1);
 
 % Build diagonals of the global tridiagonal matrix
 alpha = u*dt/h;
-beta  = D/h^2;
+beta  = D*dt/h^2;
 Ap = -2*beta - alpha - 1;
 Ae = beta;
 Aw = beta + alpha;

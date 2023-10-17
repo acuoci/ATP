@@ -147,13 +147,6 @@ for m=1:nstep
         uds.Ai = u/h*(uds.fo(i) - uds.fo(i-1));                 % upwind
 
         % Advection term using flux limiters
-        if ((flm.fo(i) - flm.fo(i-1)) == 0)
-            rE = 0.;
-            rW = 0.;
-        else
-            rE = (flm.fo(i+1) - flm.fo(i))/(flm.fo(i) - flm.fo(i-1));
-            rW = rE;
-        end
         rE = r (flm.fo, i);
         rW = r (flm.fo, i-1);
         psiE = psi_muscl (rE);
@@ -210,3 +203,4 @@ end
 function psi = psi_superbee (r)
     psi = max ([0, min(2*r, 1), min(r, 2)]);
 end
+
