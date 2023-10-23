@@ -109,9 +109,10 @@ for iter=1:maxiter
 end
 
 % Plot the solution: function f in every point x
-plot(x,f,"LineWidth",1.8);
+plot(x, f, "LineWidth", 2);
 xlabel("length [m]");
 ylabel("scalar field f");
+grid on;
 
 % Print the number of iterations that were used to convergence
 fprintf("Number of iterations = %d\n", iter);

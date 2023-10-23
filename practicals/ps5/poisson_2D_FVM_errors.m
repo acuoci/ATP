@@ -44,9 +44,10 @@
 
 clc; close all; clear;
 
-levels = [2, 3, 4, 5, 6, 7, 8];
+% Run at different levels of refinement
+% ncells = 2^level for each dimension
+levels = [4, 5, 6, 7];
 errors = zeros(size(levels));
-steps  = 10./2.^(levels);
 
 for i=1:length(levels)
     errors(i) = run(levels(i));
@@ -54,14 +55,13 @@ end
 
 figure;
 loglog (2.^levels, errors, 'x', LineWidth=2); hold on;
-% loglog (2.^levels, 1*(2.^levels).^-1); hold on;
 loglog (2.^levels, 20.*(2.^levels).^-2); hold on;
 set (gca, 'YScale', 'log');
 xlabel ("N");
 ylabel ("L_2");
 xlim ([2^(levels(1)-1), 2^(levels(end)+1)]);
-legend ("Results", "1^{st} order", "2^{nd} Order");
-title ("Convergence rate of the time derivative");
+legend ("Results", "2^{nd} Order");
+title ("Convergence rate of the spatial derivative");
 axis("square");
 grid ("on");
 
@@ -88,15 +88,7 @@ function err = run (level)
     fo = zeros (ncells+2);
     fp = zeros (ncells+1);
     
-    s  = zeros (ncells+2);
-    sp = zeros (ncells+1);
-    
-    for i=1:ncells+2
-        for j=1:ncells+2
-            s(i,j) = source (xc(i), xc(j));
-        end
-    end
-
+    % Loop over total number of iterations
     for iter=1:maxiter
         
         % Update boundary conditions
@@ -149,6 +141,7 @@ function err = run (level)
         end
     end
     
+    % Plot results as a 2D surface
     surf (x, x, fp');
     axis square;
     colormap jet;
@@ -158,6 +151,7 @@ function err = run (level)
     ylabel ("y");
     colorbar;
     
+    % Compute the exact solution
     ep = zeros (ncells+1);
     for i=1:ncells+1
         for j=1:ncells+1
@@ -165,6 +159,7 @@ function err = run (level)
         end
     end
     
+    % Compute the error (L2-norm)
     err = 0;
     for i=2:ncells+1
         for j=2:ncells+1
