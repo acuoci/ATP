@@ -54,9 +54,8 @@ for i=1:length(levels)
 end
 
 figure;
-loglog (2.^levels, errors, 'x', LineWidth=2); hold on;
-loglog (2.^levels, 20.*(2.^levels).^-2); hold on;
-set (gca, 'YScale', 'log');
+loglog (2.^levels, errors, 'x', "LineWidth", 2); hold on;
+loglog (2.^levels, 20.*(2.^levels).^-2, "LineWidth", 2); hold on;
 xlabel ("N");
 ylabel ("L_2");
 xlim ([2^(levels(1)-1), 2^(levels(end)+1)]);
@@ -79,7 +78,6 @@ function err = run (level)
     % Grid
     ncells = (2^level);
     h = L/ncells;
-    x = linspace (0., L, ncells+1);
     xp = linspace (-0.5*L, 0.5*L, ncells+1);
     xc = linspace (-0.5*L-0.5*h, 0.5*L+0.5*h, ncells+2);
     
@@ -142,7 +140,7 @@ function err = run (level)
     end
     
     % Plot results as a 2D surface
-    surf (x, x, fp');
+    surf (xp, xp, fp');
     axis square;
     colormap jet;
     shading interp;
@@ -150,14 +148,6 @@ function err = run (level)
     xlabel ("x");
     ylabel ("y");
     colorbar;
-    
-    % Compute the exact solution
-    ep = zeros (ncells+1);
-    for i=1:ncells+1
-        for j=1:ncells+1
-            ep(i,j) = exact (xp(i), xp(j));
-        end
-    end
     
     % Compute the error (L2-norm)
     err = 0;
@@ -167,7 +157,6 @@ function err = run (level)
     
             el = abs (f(i,j) - exact(xi, yi));
             err = err + el^2;
-            % err = err + el*h^0.5;
         end
     end
     err = h*sqrt (err); 
