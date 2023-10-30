@@ -250,7 +250,9 @@ p_horizontal_profile = pp(:,nc/2+1);
 
 % Be careful: cols 1,2 for Re=100, 3,4 for Re=400, 5,6 for Re=1000
 subplot (2,3,4);
-plot(exp_u_along_y(:,1), exp_u_along_y(:,2), 'o', x, u_profile, '-');
+plot (exp_u_along_y(:,1), exp_u_along_y(:,2), "o", "LineWidth", 2);
+hold on;
+plot (x, u_profile, "LineWidth", 2);
 title('u along y (centerline)');
 xlabel('y');
 ylabel('u');
@@ -259,10 +261,25 @@ axis square;
 grid on;
 
 subplot (2,3,5);
-plot(exp_v_along_x(:,1), exp_v_along_x(:,2), 'o', x, v_profile, '-');
+plot (exp_v_along_x(:,1), exp_v_along_x(:,2), "o", "LineWidth", 2);
+hold on;
+plot (x, v_profile, "LineWidth", 2);
 title('v along x (centerline)');
 xlabel('y');
 ylabel('v');
 xlim([0 L]);
 axis square;
 grid on;
+
+subplot (2,3,6);
+sx = 0:4*h:L;
+sy = 0:4*h:L;
+[X, Y] = meshgrid (x, x);
+streamline (X, Y, up', vp', sx, sy);
+title('streamlines');
+xlabel('x');
+ylabel('y');
+xlim([0 L]);
+axis square;
+grid on;
+
