@@ -48,36 +48,40 @@ clc; close all; clear;
 L = 1.;             % Length of the domain [m]
 nu = 1.e-2;         % Kinematic viscosity [m2/s]
 tau = 20.;          % Total simulation time [s]
-level = 5;          % Maximum level of refinement
+level = 7;
 
-% Grid setup
-Lx = L;
-Ly = L;
+% [INOUT] Grid setup
+Lx = 8;
+Ly = 1;
 nx = 2^level;
 hx = Lx/nx;
 hy = hx;
 ny = Ly/hy;
-x = linspace (0., L, nx+1);
+x = linspace (0., Lx, nx+1);
+y = linspace (0., Ly, ny+1);
 h = hx;
 
 % Dirichlet boundary conditions everywhere
-unwall = 1.;            % north side velocity [m/s]
+unwall = 0.;            % north side velocity [m/s]
 uswall = 0.;
 vewall = 0.;
 vwwall = 0.;
 
+% [INOUT] Inlet velocities
+uin = 1.;
+
 % Poisson solver settings
 maxiter = 10000;
-beta = 1.6;
-tolerance = 1.e-9;
+beta = 1.9;
+tolerance = 1.e-6;
 
 % Time step setup
 sigma = 0.5;
 dt_diff = h^2/4/nu;
-dt_conv = 4*nu/unwall^2;
+dt_conv = 4*nu/uin^2;
 dt = sigma*min (dt_diff, dt_conv);
 nsteps = tau/dt;
-Re = unwall*L/nu;
+Re = uin*L/nu;
 
 % Print initial info
 fprintf ("Time step = %f - Re = %f\n", dt, Re);
@@ -106,6 +110,20 @@ gamma(2,end-1) = 1/2;
 gamma(end-1,2) = 1/2;
 gamma(end-1,end-1) = 1/2;
 
+% [INOUT] Correction of gamma coefficients for taking into account inlet and outlet sections
+gamma(2,:) = 1/3;           % Inlet section is treated like a boundary
+gamma(nx+1,:) = 1/4;      % Outlet section is treated as an internal cell
+
+% [INOUT] Correction of gamma coeffiecient for edges
+gamma(2,2) = 1/2;   % Correct edges
+gamma(2,ny+1) = 1/2;
+
+
+% [INOUT] Initial conditions: set reasonable initial velocity value instead of
+% initializing everything to zero
+u(:,:) = 0.5;
+ut = u; vt = v;
+
 % Time solution loop
 time = 0.;
 for m=1:nsteps
@@ -117,6 +135,13 @@ for m=1:nsteps
     u(:,end) = 2*unwall - u(:,end-1);    % north wall
     v(1,:)   = 2*vwwall - v(2,:);        % west wall
     v(end,:) = 2*vewall - v(end-1,:);    % east wall
+
+    % [INOUT] Over-writing inlet conditions
+    u(1,:) = uin;               % fixed inlet velocity
+    
+    % [INOUT] Over-writing outlet conditions
+    u(nx+1,:) = u(nx,:);    % zero-gradient outlet velocity
+    v(nx+2,:) = v(nx+1,:);  % zero-gradient outlet velocity
 
     %-- Prediction: find temporary velocity
 
@@ -151,6 +176,11 @@ for m=1:nsteps
             vt(i,j) = v(i,j) + dt*(-Aij + Dij);
         end
     end
+
+    % [INOUT] Update boundary conditions for temporary velocity
+    ut(1,:) = u(1,:);            % fixed inlet velocity
+    ut(nx+1,:) = u(nx+1,:);  % zero-gradient outlet velocity
+    vt(nx+2,:) = v(nx+2,:);  % zero-gradient outlet velocity
 
     %-- Projection: find the pressure that statisfies the continuity
 
@@ -204,6 +234,9 @@ for m=1:nsteps
             v(i,j) = vt(i,j) - dt/h*(p(i,j+1) - p(i,j));
         end
     end
+
+    % [INOUT] Correct the velocity on the outlet patch
+    u(nx+1,:) = ut(nx+1,:) - dt/h*(p(nx+2,:) - p(nx+1,:));
 end
 
 %-- Linear interpolations
@@ -225,73 +258,27 @@ for i=1:nx+1
     end
 end
 
-subplot (2,3,1);
-surf (x, x, up');
+subplot (3,1,1);
+surf (x, y, up');
 view (2);
-axis square;
+axis tight;
 colormap jet;
 colorbar;
 shading interp;
 
-subplot (2,3,2);
-surf (x, x, vp');
+subplot (3,1,2);
+surf (x, y, vp');
 view (2);
-axis square;
+axis tight;
 colormap jet;
 colorbar;
 shading interp;
 
-subplot (2,3,3);
-surf (x, x, pp');
+subplot (3,1,3);
+surf (x, y, pp');
 view (2);
-axis square;
+axis tight;
 colormap jet;
 colorbar;
 shading interp;
-
-%-- Compare with exp data (available only for Re=100, 400, and 1000)
-
-% Read experimental data from file
-exp_u_along_y = dlmread('exp_u_along_y', '', 1, 0);
-exp_v_along_x = dlmread('exp_v_along_x', '', 1, 0);
-
-u_profile = up(nx/2+1,:);
-v_profile = vp(:,ny/2+1);
-p_vertical_profile = pp(nx/2+1,:);
-p_horizontal_profile = pp(:,ny/2+1);
-
-% Be careful: cols 1,2 for Re=100, 3,4 for Re=400, 5,6 for Re=1000
-subplot (2,3,4);
-plot (exp_u_along_y(:,1), exp_u_along_y(:,2), "o", "LineWidth", 2);
-hold on;
-plot (x, u_profile, "LineWidth", 2);
-title('u along y (centerline)');
-xlabel('y');
-ylabel('u');
-xlim([0 L]);
-axis square;
-grid on;
-
-subplot (2,3,5);
-plot (exp_v_along_x(:,1), exp_v_along_x(:,2), "o", "LineWidth", 2);
-hold on;
-plot (x, v_profile, "LineWidth", 2);
-title('v along x (centerline)');
-xlabel('y');
-ylabel('v');
-xlim([0 L]);
-axis square;
-grid on;
-
-subplot (2,3,6);
-sx = 0:4*h:L;
-sy = 0:4*h:L;
-[X, Y] = meshgrid (x, x);
-streamline (X, Y, up', vp', sx, sy);
-title('streamlines');
-xlabel('x');
-ylabel('y');
-xlim([0 L]);
-axis square;
-grid on;
 
