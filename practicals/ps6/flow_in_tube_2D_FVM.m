@@ -117,6 +117,8 @@ gamma(nx+1,:) = 1/4;      % Outlet section is treated as an internal cell
 % [INOUT] Correction of gamma coeffiecient for edges
 gamma(2,2) = 1/2;   % Correct edges
 gamma(2,ny+1) = 1/2;
+gamma(nx+1,2) = 1/3;
+gamma(nx+1,ny+1) = 1/3;
 
 
 % [INOUT] Initial conditions: set reasonable initial velocity value instead of
