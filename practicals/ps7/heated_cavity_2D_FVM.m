@@ -205,7 +205,7 @@ for m=1:nsteps
 
     for i=2:nx
         for j=2:ny+1
-            acc = betaexp*rho*g*(T(i,j) - Tinit);
+            acc = betaexp*rho*g*(T(i,j) - Tinit)/rho;
             ut(i,j) = ut(i,j) + dt*acc;
         end
     end
