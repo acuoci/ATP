@@ -84,12 +84,10 @@ maxiter = 10000;
 beta = 1.6;
 tolerance = 1.e-6;
 
-% Time step setup
-% sigma = 0.5;
-% dt_diff = h^2/4/nu;
-% dt_conv = 4*nu/unwall^2;
-% dt = sigma*min (dt_diff, dt_conv);
-dt = 0.005;
+% [HEATED] Time step setup
+sigma = 0.8;
+dt_thermal_diff = h^2/4/alpha;
+dt = sigma*dt_thermal_diff;
 nsteps = tau/dt;
 Re = unwall*L/nu;
 
