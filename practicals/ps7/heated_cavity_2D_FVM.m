@@ -345,13 +345,13 @@ p_vertical_profile = pp(nx/2+1,:);
 p_horizontal_profile = pp(:,ny/2+1);
 
 subplot (2,3,4);
-plot (ref_u_along_y(:,2), ref_u_along_y(:,1), "o", "LineWidth", 2);
+plot (ref_u_along_y(:,1), ref_u_along_y(:,2), "o", "LineWidth", 2);
 hold on;
-plot (x, u_profile, "LineWidth", 2);
+plot (-v_profile, x, "LineWidth", 2);
 title('u along y (centerline)');
 xlabel('y');
 ylabel('u');
-xlim([0 L]);
+ylim([0 1]);
 axis square;
 grid on;
 
