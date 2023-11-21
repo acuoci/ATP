@@ -199,7 +199,7 @@ for m=1:nsteps
         end
     end
 
-    %-- Acceleration: we add the gravity acceleration term (along y)
+    %-- [HEATED] Acceleration: we add the gravity acceleration term (along y)
 
     for i=2:nx
         for j=2:ny+1
