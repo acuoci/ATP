@@ -173,11 +173,11 @@ function C = AdvectionDiffusionReaction1D (C, S, u, Dmix, dt, h, ncells)
 
     Co = C;
     for i=2:ncells+1
-        Ai = u*h/2*(Co(i+1) - Co(i-1));
-        Di = Dmix*(Co(i+1) + Co(i-1) - 2*Co(i));
-        Ri = S(i)*h^2;
+        Ai = u*h^2/2*(Co(i+1) - Co(i-1));
+        Di = Dmix*h*(Co(i+1) + Co(i-1) - 2*Co(i));
+        Ri = S(i)*h^3;
 
-        C(i) = Co(i) + dt/h^2*(-Ai + Di + Ri);
+        C(i) = Co(i) + dt/h^3*(-Ai + Di + Ri);
     end
 
 end
