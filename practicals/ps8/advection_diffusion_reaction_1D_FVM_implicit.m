@@ -60,7 +60,7 @@ u = 1;
 Dmix = 1.e-2;
 k1 = 10;
 k2 = 1;
-sigma = 0.9;
+sigma = 5;
 
 CAin = 1.;
 CBin = 0.;
