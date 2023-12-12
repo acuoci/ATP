@@ -85,7 +85,7 @@ ntimes = length(t);
 % Reconstruction of density function (#/cm3/mum)
 f = zeros (ntimes, neq);
 for i=1:ntimes
-    for j=2:(length(N)-1)
+    for j=1:(length(N)-1)
         f(i+1,j) = N(i,j)/(r(i+1)-r(i));
     end
 end
