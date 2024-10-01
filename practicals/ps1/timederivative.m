@@ -48,7 +48,8 @@ clc; close all; clear;
 
 % We create a vector with the number of time steps of the simulation
 Nstepsvec(1) = 10;
-while (Nstepsvec(end) < 10000.)
+MAX_STEP = 10000;
+while (Nstepsvec(end) < MAX_STEP)
     Nstepsvec(end+1) = Nstepsvec(end)*2;
 end
 
@@ -95,7 +96,7 @@ function [error] = run(Nsteps)
     x1 = 1.;            % Initial value of x1
     x2 = 0.;            % Initial value of x2
     tend = 2.*pi;       % Total simulation time
-    dt = tend/Nsteps;   % Time step
+    dt = tend/(Nsteps - 1);   % Time step
     
     x1vec(1) = x1;
     x2vec(1) = x2;
