@@ -2,7 +2,7 @@
 
 List of the practical sessions discussed during the Advanced Transport Phenomena class.
 
-## [PS1](ps1): Discretization of the Time Derivative
+## [Discretization of the Time Derivative](ps1)
 
 Solution of the ODE system of equations:
 
@@ -22,7 +22,7 @@ $$
   <img src="doc/ps1-errors.png" width="40%" />
 </p>
 
-## [PS2](ps2): Solution of the Heat Equation
+## [Solution of the Heat Equation](ps2)
 
 Solution of the 1D Heat Equation with source term, for the evolution of the temperature field $T$ along a metal slab.
 
@@ -38,4 +38,22 @@ where $\alpha = \lambda/\rho/Cp$ is the thermal diffusion coefficient, assuming 
 <p align="middle" >
   <img src="doc/ps2-heatequation.gif" width="49%" /> 
   <img src="doc/ps2-heatequation-sources.gif" width="49%" />
+</p>
+
+## [Solution of a Benchmark Advection-Diffusion Equation](ps3)
+
+Solution of the 1D Advection-Diffusion equation for the transport of a sine wave.
+
+$$
+  \dfrac{\partial f}{\partial t} + \mathbf{u}\cdot\nabla f = \Gamma \nabla^2 f
+$$
+
+where the velocity field $\mathbf{u}$ and the diffusion coefficient $\Gamma$ are constant and uniform. The problem is initialized to the analytical solution, and periodic boundary conditions are used.
+
+* **Analytical Solution:** $f(x,t) = A \sin(2\pi k (x - \mathbf{u}t)) e^{-4\pi^2k^2\Gamma t}$, where $A$ is the amplitude, while $k$ is the wave number.
+* **Methodology:** 1<sup>st</sup> order forward Euler approach for the discretization of the time derivative. Comparison of 1<sup>st</sup> order and 2<sup>nd</sup> order approaches for the discretization of the convective term: BDS and CDS approximations for the finite difference case, Upwind and Centered approximations for the finite volume case. 2<sup>nd</sup> order centered approach for the discretization of the diffusion term.
+* **Key Tests:** implementation of the problem using FDM and FVM, including the implementation of periodic boundary conditions. Testing the stability of the time discretization, and the behavior of the system at different velocity and diffusivity, with particular focus on pure convective conditions ($\Gamma = 0$).
+
+<p align="middle" >
+  <img src="doc/ps3-plots.gif" width="49%" /> 
 </p>
