@@ -79,7 +79,7 @@ Tright = 300;       % BC for temperature on the right side of the domain [K]
 Tinit = 300;        % IC for temperature at time=0 [K].
 
 % Memory allocations
-T = ones(ncells+2)*Tinit; % Number of cells + 2 ghost cells
+T = ones(ncells+2, 1)*Tinit; % Number of cells + 2 ghost cells
 Tplot = zeros(size(x));
 
 % ----------------------------------------------------------------------- %
