@@ -34,3 +34,8 @@ where $\alpha = \lambda/\rho/Cp$ is the thermal diffusion coefficient, assuming 
 
 * **Metodology:** 1<sup>st</sup> order forward Euler approach for the discretization of the time derivative; 2<sup>nd</sup> order centered approach for the discretization of the diffusion term. The system is approximated both using both the [Finite Difference](ps2/diffusioneq_1D_FDM_explicit.m) and the [Finite Volume](ps2/diffusioneq_1D_FVM_explicit.m) discretization methods.
 * **Ket Test:** differences between FDM and FVM, including the implementation of the boundary conditions. Effect of the introduction of a source term on the steady state solution. Importance of the choice of the time step for the stability of the system.
+
+<p align="middle" >
+  <img src="doc/ps2-heatequation.gif" width="49%" /> 
+  <img src="doc/ps2-heatequation-sources.gif" width="49%" />
+</p>
