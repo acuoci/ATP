@@ -2,7 +2,7 @@
 
 List of the practical sessions discussed during the Advanced Transport Phenomena class.
 
-## [PS1](practicals/ps1): Discretization of the Time Derivative
+## [PS1](ps1): Discretization of the Time Derivative
 
 Solution of the ODE system of equations:
 
@@ -17,3 +17,7 @@ $$
 * **Metodology:** 1<sup>st</sup> order forward Euler approach for the discretization of the time derivative.
 * **Key Test:** comparison between the numerical and analytical solution, and evaluation of the convergence rate at time $t = 2\pi$.
 
+<p align="middle" >
+  <img src="doc/ps1-plots.png" width="40%" /> 
+  <img src="doc/ps1-errors.png" width="40%" />
+</p>
