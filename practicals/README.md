@@ -57,3 +57,20 @@ where the velocity field $\mathbf{u}$ and the diffusion coefficient $\Gamma$ are
 <p align="middle" >
   <img src="doc/ps3-plots.gif" width="49%" /> 
 </p>
+
+## [Transport of a Discontinuity](ps4)
+
+Solution of the 1D Advection equation:
+
+$$
+  \dfrac{\partial f}{\partial t} + \mathbf{u}\cdot\nabla f = 0
+$$
+
+for a step function $f$. In these conditions, the centered scheme leads to strong oscillations, while the upwind scheme leads to unphysical diffusion. We implement a possible solution to this problem.
+
+* **Methodology:** 1<sup>st</sup> order forward Euler approach for the discretization of the time derivative. Comparison of 1<sup>st</sup> order upwind and 2<sup>nd</sup> order centered approaches for the discretization of the convective terms, in finite volumes. Implementation of flux limiters to switch between upwind and centered schemes depending on the local gradient of the function.
+* **Key Tests:** comparison between centered, upwind, and flux limiter cases.
+
+<p align="middle" >
+  <img src="doc/ps4-discontinuity.gif" width="49%" /> 
+</p>
