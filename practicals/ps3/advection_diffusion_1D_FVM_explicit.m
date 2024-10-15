@@ -142,17 +142,20 @@ for m=1:nsteps
         end
 
         % Graphical output
-        hold off; plot(0:h:L,fp,'linewidth',2); axis([0 L -1, 1]);
-	    hold on; plot(0:h:L,ap,'r','linewidth',2);
-        hold on; legend('numerical', 'exact');
-        xlabel('spatial coordinate [m]');
+        hold off;
+        plot(x, fp,'LineWidth',2);
+        axis([0 L -1, 1]);
+        hold on;
+        plot(x, ap, 'r', 'LineWidth',2);
+        legend('Numerical', 'Exact');
+        xlabel('Spatial coordinate [m]');
         ylabel('f');
         title('Evolution of the solution in space and time');
         grid on;
         drawnow;
-    
+
         if(0)
-            filename = 'ps3-plots.gif';    
+            filename = 'ps3-plots.gif';
             message = sprintf('time=%g s\n', t);
             time = annotation ('textbox', [0.7 0.05 0.2 0.2], 'String', message, 'EdgeColor', 'none');
             set(gcf, 'Color', 'w');

@@ -119,10 +119,13 @@ for m=1:nsteps
 
     if (mod(m,5) == 1)
         % Graphical output
-        hold off; plot(0:h:L,f,'linewidth',2); axis([0 L -1, 1]);
-        hold on; plot(0:h:L,a,'r','linewidth',2);
-        hold on; legend('numerical', 'exact');
-        xlabel('spatial coordinate [m]');
+        hold off;
+        plot(x, f, 'LineWidth',2);
+        axis([0 L -1, 1]);
+        hold on;
+        plot(x, a,'r','LineWidth',2);
+        legend('Numerical', 'Exact');
+        xlabel('Spatial coordinate [m]');
         ylabel('f');
         title('Evolution of the solution in space and time');
         grid on;
