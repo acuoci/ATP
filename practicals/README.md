@@ -58,7 +58,7 @@ where the velocity field $\mathbf{u}$ and the diffusion coefficient $\Gamma$ are
   <img src="doc/ps3-plots.gif" width="49%" /> 
 </p>
 
-## [Transport of a Discontinuity](ps4)
+## [Transport of a Discontinuity](ps4/advection_discontinuity_1D_FVM.m)
 
 Solution of the 1D Advection equation:
 
@@ -73,4 +73,27 @@ for a step function $f$. In these conditions, the centered scheme leads to stron
 
 <p align="middle" >
   <img src="doc/ps4-discontinuity.gif" width="49%" /> 
+</p>
+
+## [Time implicit solution of Advection-Diffusion equations](ps4/implicit_advection_diffusion_1D_FVM.m)
+
+Solution of the 1D Advection equation:
+
+$$
+  \dfrac{\partial f}{\partial t} + \mathbf{u}\cdot\nabla f = \Gamma\nabla^2 f
+$$
+
+intialized as a Gaussian function:
+
+$$
+  f(x) = \dfrac{1}{\sigma \sqrt{2\pi}} \exp\left(-\dfrac{(x - \mu)^2}{2\sigma^2}\right)
+$$
+
+using a Dirichlet boundary condition for the right side of the domain $f(x=0,t) = 0$ and a Neumann boundary condition for the right side $\nabla f|_{x=L} = 0$.
+
+* **Methodology:** 1<sup>st</sup> order backward Euler approach for the discretization of the time derivative. 1<sup>st</sup> order upwind approach for the discretization of the convective terms, 2<sup>nd</sup> order centered approach for diffusion term, using the FVM.
+* **Key Tests:** verify that the solution is stable regardless the time step, and analyze the different solutions at varying Peclet number.
+
+<p align="middle" >
+  <img src="doc/ps4-implicit.gif" width="49%" /> 
 </p>
