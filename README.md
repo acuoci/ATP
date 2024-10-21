@@ -7,7 +7,7 @@ The numerical codes are organized in the following folders:
 
 1. `lectures`: codes presented and discussed in the ATP lectures
 
-2. `practicals`: codes and problems presented and discussed in the ATP practical sessions
+2. `practicals`: codes and problems presented and discussed in the ATP practical sessions (see [practicals/README.md](practicals/README.md))
 
 
 ## 1. Advection-diffusion-reaction equation in 1D with the Finite Difference (FD) method
