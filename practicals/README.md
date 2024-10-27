@@ -97,3 +97,29 @@ using a Dirichlet boundary condition for the right side of the domain $f(x=0,t) 
 <p align="middle" >
   <img src="doc/ps4-implicit.gif" width="49%" /> 
 </p>
+
+## [Iterative solution of Poisson Equations](ps5)
+
+Solution of the 1D Poisson equation:
+
+$$
+  \nabla^2 f = S
+$$
+
+where the the source term is constant and equal to 1, the left and right boundaries of the domain are prescribed with Dirichlet boundary conditions ($f_{left} = 0$, and $f_{right} = 1$).
+
+* **Methodology:** Jacobi method, Gauss-Seidel, and Successive Over-Relaxation for the iterative solution of the problem. Discretization using the Finite Volume Method, using a centered 2<sup>nd</sup> order approach for the Laplacian operator.
+* **Key Tests:** observe the different number of iterations required to reach convergence using Jacobi, Gauss-Seidel and the SOR methods (at different over-relaxation parameters $\beta$).
+
+<div align="center">
+
+| Method  | $\boldsymbol{\beta}$ | iterations |
+| ------- | ------- |----------- |
+| Jacobi  | -  | 4043 |
+| Gauss-Seidel |  - | 1982 |
+| Gauss-Seidel + SOR | $\beta = 1.5$  | 667 |
+| Gauss-Seidel + SOR | $\beta = 1.7$  | 355 |
+| Gauss-Seidel + SOR | $\beta = 1.9$  | 128 |
+| Gauss-Seidel + SOR | $\beta = 1.95$ | 244 |
+
+</div>
