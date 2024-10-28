@@ -103,12 +103,12 @@ using a Dirichlet boundary condition for the right side of the domain $f(x=0,t) 
 Solution of the 1D Poisson equation:
 
 $$
-  \nabla^2 f = S
+  \nabla\cdot\left(\nabla f\right) = S
 $$
 
 where the the source term is constant and equal to 1, the left and right boundaries of the domain are prescribed with Dirichlet boundary conditions ($f_{left} = 0$, and $f_{right} = 1$).
 
-* **Methodology:** Jacobi method, Gauss-Seidel, and Successive Over-Relaxation for the iterative solution of the problem. Discretization using the Finite Volume Method, using a centered 2<sup>nd</sup> order approach for the Laplacian operator.
+* **Methodology:** Jacobi method, Gauss-Seidel, and Successive Over-Relaxation for the iterative solution of the problem. Discretization using the Finite Difference Method, using a centered 2<sup>nd</sup> order approach for the Laplacian operator.
 * **Key Tests:** observe the different number of iterations required to reach convergence using Jacobi, Gauss-Seidel and the SOR methods (at different over-relaxation parameters $\beta$).
 
 <div align="center">
