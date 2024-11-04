@@ -123,3 +123,25 @@ where the the source term is constant and equal to 1, the left and right boundar
 | Gauss-Seidel + SOR | $\beta = 1.95$ | 244 |
 
 </div>
+
+## [Lid Driven Cavity](ps6/lid_driven_cavity_2D_FVM.m)
+
+Solve the incompressible Navier-Stokes equations:
+
+$$
+\dfrac{\partial \mathbf{u}}{\partial t} + \mathbf{u}\cdot\nabla\mathbf{u} = \nu\nabla^2\mathbf{u} - \dfrac{1}{\rho}\nabla p + \mathbf{a}
+$$
+$$
+\nabla\cdot\mathbf{u} = 0
+$$
+
+for an initially quiescient fluid in a square (2D) cavity, with lenght $L = 1 m$. The integration of the problem is performed for a sufficiently long time, until reaching the steady state. The east, west, and south walls of the domain are closed ($\mathbf{u} = 0$ and $\nabla p = 0$). The top wall (lid) moves with a given velocity $\mathbf{u} = (1,0) m/s$. The kinematic viscosity $\nu$ is adjusted depending on the simulation Reynolds number, whose initial value is $Re = 100$. Any other acceleration term $\mathbf{a}$ is neglected.
+
+We want to find the velocity and pressure fields in every point of the domain.
+
+* **Methodology:** Projection method for the pressure-velocity coupling. 1<sup>st</sup> order forward (explicit) Euler approach for the discretization of the time derivative. 2<sup>nd</sup> order centered approach for the discretization of the convective terms, 2<sup>nd</sup> order centered approach for diffusion term. Use the Finite Volume Method with a staggered grid.
+* **Key Tests:** focus on the implementation technique, the different behavior of the system at different Reynolds number, and comparison with experimental data at different grid resolutions.
+
+<p align="middle" >
+  <img src="doc/lid.png" width="100%" /> 
+</p>
