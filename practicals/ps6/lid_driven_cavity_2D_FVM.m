@@ -228,6 +228,7 @@ end
 subplot (2,3,1);
 surf (x, x, up');
 view (2);
+title('u.x');
 axis square;
 colormap jet;
 colorbar;
@@ -236,6 +237,7 @@ shading interp;
 subplot (2,3,2);
 surf (x, x, vp');
 view (2);
+title('u.y');
 axis square;
 colormap jet;
 colorbar;
@@ -244,6 +246,7 @@ shading interp;
 subplot (2,3,3);
 surf (x, x, pp');
 view (2);
+title('p');
 axis square;
 colormap jet;
 colorbar;
@@ -266,6 +269,7 @@ plot (exp_u_along_y(:,1), exp_u_along_y(:,2), "o", "LineWidth", 2);
 hold on;
 plot (x, u_profile, "LineWidth", 2);
 title('u along y (centerline)');
+legend ("Experiments", "Results");
 xlabel('y');
 ylabel('u');
 xlim([0 L]);
@@ -277,6 +281,7 @@ plot (exp_v_along_x(:,1), exp_v_along_x(:,2), "o", "LineWidth", 2);
 hold on;
 plot (x, v_profile, "LineWidth", 2);
 title('v along x (centerline)');
+legend ("Experiments", "Results");
 xlabel('y');
 ylabel('v');
 xlim([0 L]);
@@ -295,3 +300,15 @@ xlim([0 L]);
 axis square;
 grid on;
 
+if (0)
+    set(gcf, 'Color', 'w');
+
+    x0=10;
+    y0=10;
+    width=1800;
+    height=1200;
+    set(gcf,'position',[x0,y0,width,height]);
+
+    img = getframe(gcf);
+    imwrite(img.cdata, 'lid.png');
+end
