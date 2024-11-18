@@ -145,3 +145,14 @@ We want to find the velocity and pressure fields in every point of the domain.
 <p align="middle" >
   <img src="doc/lid.png" width="100%" /> 
 </p>
+
+## [Flow in a Tube](ps7/flow_in_tube_2D_FVM.m)
+
+Extend the lid driven cavity problem solving the same set of 2D incompressible Navier-Stokes equations but for the flow in a tube problem. The geometry of a 2D tube is a rectangle with width $L_x = 1 m$ and height $L_y = 8 m$. Initially, the kinematic viscosity is set to $\nu = 10^{-2}$, while the inlet velocity is $\mathbf{u}_{in} = (0.1,0) m/s$.
+
+* **Methodology:** Compared to the lid driven cavity problem, this test case has different geometry and boundary condition. The top and bottom walls have _no-slip_ boundary conditons, the left wall considers the inlet fluid velocity, while at the right side we set _outflow_ conditions:
+* **Key Tests:** Focus on the different boundary conditions for the pressure equation, and discuss the trend of the numerical results at different Reynolds numbers.
+
+<p align="middle" >
+  <img src="doc/tube.png" width="90%" /> 
+</p>
