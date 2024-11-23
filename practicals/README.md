@@ -156,3 +156,28 @@ Extend the lid driven cavity problem solving the same set of 2D incompressible N
 <p align="middle" >
   <img src="doc/tube.png" width="90%" /> 
 </p>
+
+## [Heated Cavity](ps8/heated_cavity_2D_FVM.m)
+
+Solve the incompressible Navier-Stokes equations coupled with the energy equation using the Boussinesq approximation:
+
+$$
+\dfrac{\partial \mathbf{u}}{\partial t} + \mathbf{u}\cdot\nabla\mathbf{u} = \nu_0\nabla^2\mathbf{u} - \dfrac{1}{\rho_0}\nabla p - \mathbf{g}\rho_0\beta(T - T_0) 
+$$
+$$
+\nabla\cdot\mathbf{u} = 0
+$$
+$$
+\rho_0 c_{p,0} \left( \dfrac{\partial T}{\partial t} + \mathbf{u}\cdot\nabla T \right) = \nabla \cdot \left(\lambda_0\nabla T\right)
+$$
+
+for an initially quiescient fluid in a square (2D) cavity, with lenght $L = 1 m$. The temperature is imposed to constant values on the left (cold) and on the right (hot) walls, while the top and bottom boundaries are adiabatic.
+
+We want to find the velocity, pressure, and temperature fields in every point of the domain.
+
+* **Methodology:** Projection method for the pressure-velocity coupling. 1<sup>st</sup> order forward (explicit) Euler approach for the discretization of the time derivative. 2<sup>nd</sup> order centered approach for the discretization of the convective terms, 2<sup>nd</sup> order centered approach for diffusion term. Use the Finite Volume Method with a staggered grid. Buoyancy driven flows are included using Boussinesq approximation. 
+* **Key Tests:** focus on the implementation technique, the different behavior of the system at different Reynolds number, and comparison with experimental data at different grid resolutions.
+
+<p align="middle" >
+  <img src="doc/heated.png" width="100%" /> 
+</p>
