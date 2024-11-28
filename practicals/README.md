@@ -176,7 +176,7 @@ for an initially quiescient fluid in a square (2D) cavity, with lenght $L = 1 m$
 We want to find the velocity, pressure, and temperature fields in every point of the domain.
 
 * **Methodology:** Projection method for the pressure-velocity coupling. 1<sup>st</sup> order forward (explicit) Euler approach for the discretization of the time derivative. 2<sup>nd</sup> order centered approach for the discretization of the convective terms, 2<sup>nd</sup> order centered approach for diffusion term. Use the Finite Volume Method with a staggered grid. Buoyancy driven flows are included using Boussinesq approximation. 
-* **Key Tests:** focus on the implementation technique, the different behavior of the system at different Rayleigh number, and compare the results with the numerical solution from the book by Ferziger & Peric (Computational Methods for Fluid Mechanics) at different grid resolutions.
+* **Key Tests:** focus on the implementation technique, the different behavior of the system at different Rayleigh number, and compare the results with the numerical solution from the book by Ferziger & Peric (Computational Methods for Fluid Dynamics) at different grid resolutions.
 
 <p align="middle" >
   <img src="doc/heated.png" width="100%" /> 
