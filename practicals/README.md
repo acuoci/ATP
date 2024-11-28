@@ -162,7 +162,7 @@ Extend the lid driven cavity problem solving the same set of 2D incompressible N
 Solve the incompressible Navier-Stokes equations coupled with the energy equation using the Boussinesq approximation:
 
 $$
-\dfrac{\partial \mathbf{u}}{\partial t} + \mathbf{u}\cdot\nabla\mathbf{u} = \nu_0\nabla^2\mathbf{u} - \dfrac{1}{\rho_0}\nabla p - \mathbf{g}\rho_0\beta(T - T_0) 
+\dfrac{\partial \mathbf{u}}{\partial t} + \mathbf{u}\cdot\nabla\mathbf{u} = \nu_0\nabla^2\mathbf{u} - \dfrac{1}{\rho_0}\nabla p - \mathbf{g}\beta(T - T_0) 
 $$
 $$
 \nabla\cdot\mathbf{u} = 0
@@ -176,7 +176,7 @@ for an initially quiescient fluid in a square (2D) cavity, with lenght $L = 1 m$
 We want to find the velocity, pressure, and temperature fields in every point of the domain.
 
 * **Methodology:** Projection method for the pressure-velocity coupling. 1<sup>st</sup> order forward (explicit) Euler approach for the discretization of the time derivative. 2<sup>nd</sup> order centered approach for the discretization of the convective terms, 2<sup>nd</sup> order centered approach for diffusion term. Use the Finite Volume Method with a staggered grid. Buoyancy driven flows are included using Boussinesq approximation. 
-* **Key Tests:** focus on the implementation technique, the different behavior of the system at different Reynolds number, and comparison with experimental data at different grid resolutions.
+* **Key Tests:** focus on the implementation technique, the different behavior of the system at different Rayleigh number, and compare the results with the numerical solution from the book by Ferziger & Peric (Computational Methods for Fluid Mechanics) at different grid resolutions.
 
 <p align="middle" >
   <img src="doc/heated.png" width="100%" /> 
