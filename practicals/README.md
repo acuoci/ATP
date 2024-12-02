@@ -187,7 +187,7 @@ We want to find the velocity, pressure, and temperature fields in every point of
 Solve the Advection-Diffusion-Reaction equations:
 
 $$
-\dfrac{\partial c_i}{\partial t} + \mathbf{u}\cdot\nabla c_i = \nabla\cdot\left(D\nabla c_i \right) + r_i
+\dfrac{\partial c_i}{\partial t} + \mathbf{u}\cdot\nabla c_i = \nabla\cdot\left(D\nabla c_i \right) + R_i
 $$
 
 for a 1D system, with constant velocity $\mathbf{u} = 1\text{ }m/s$, length $L = 2\text{ }m$, diffusivity $D = 10^{-2}\text{ }m^2/s$, which is integrated until steady-state. The system is isothermal and the mixture comprises three chemical species (A, B, and C), which undergo the following chemical reactions:
