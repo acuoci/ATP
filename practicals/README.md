@@ -181,3 +181,27 @@ We want to find the velocity, pressure, and temperature fields in every point of
 <p align="middle" >
   <img src="doc/heated.png" width="100%" /> 
 </p>
+
+## [Reactive Systems](ps9)
+
+Solve the Advection-Diffusion-Reaction equations:
+
+$$
+\dfrac{\partial c_i}{\partial t} + \mathbf{u}\cdot\nabla c_i = \nabla\cdot\left(D\nabla c_i \right) + r_i
+$$
+
+for a 1D system, with constant velocity $\mathbf{u} = 1\text{ }m/s$, length $L = 2\text{ }m$, diffusivity $D = 10^{-2}\text{ }m^2/s$, which is integrated until steady-state. The system is isothermal and the mixture comprises three chemical species (A, B, and C), which undergo the following chemical reactions:
+
+$$
+A \xrightarrow[]{r_1} B \xrightarrow[]{r_2} C
+$$
+
+where the reaction rates are computed as $r_1 = k_1 C_A$, and $r_2 = k_2 C_B$, respectively. Solve the problem in order to find the concentration profiles of each species ($C_A$, $C_B$, and $C_C$) along the space coordinate.
+
+* **Methodology:** Solve the problem using three different methods: i) time explicit integration; ii) time implicit with linearization of the reactive terms; iii) operator splitting. 
+* **Key Tests:** focus on the implementation technique, the stability of the system for each solution method and their underlying assumptions, and compare the simulation times.
+
+<p align="middle" >
+  <img src="doc/heated.png" width="100%" /> 
+</p>
+
