@@ -158,7 +158,28 @@ for is=1:nsteps
         xlabel ("lenght [m]"); ylabel ("Concentration [kmol/m3]");
         legend ("CA", "CB", "CC");
         xlim([0 L]); ylim([0 1]);
+        grid on;
         drawnow;
+
+        if(0)
+            filename = 'reactive.gif';
+            message = sprintf('time=%g s\n', t);
+            time = annotation ('textbox', [0.5 0.6 0.2 0.2], 'String', message, 'EdgeColor', 'none');
+            set(gcf, 'Color', 'w');
+            frame = getframe(gcf);
+            img = frame2im(frame);
+            [imind, cm] = rgb2ind(img, 256);
+        
+            % Write to the GIF file
+            if is == 1
+                imwrite(imind, cm, filename, 'gif', 'Loopcount', inf, 'DelayTime', 0.1);
+            else
+                imwrite(imind, cm, filename, 'gif', 'WriteMode', 'append', 'DelayTime', 0.1);
+            end
+        
+            delete(time);
+        end
+
     end
 
     % Advance the simulation time
