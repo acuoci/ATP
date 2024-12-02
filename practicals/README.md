@@ -202,6 +202,6 @@ where the reaction rates are computed as $r_1 = k_1 C_A$, and $r_2 = k_2 C_B$, r
 * **Key Tests:** focus on the implementation technique, the stability of the system for each solution method and their underlying assumptions, and compare the simulation times.
 
 <p align="middle" >
-  <img src="doc/heated.png" width="100%" /> 
+  <img src="doc/reactive.gif" width="49%" /> 
 </p>
 
