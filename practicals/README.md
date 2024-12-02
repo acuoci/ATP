@@ -196,7 +196,7 @@ $$
 A \xrightarrow[]{r_1} B \xrightarrow[]{r_2} C
 $$
 
-where the reaction rates are computed as $r_1 = k_1 C_A$, and $r_2 = k_2 C_B$, respectively. Solve the problem in order to find the concentration profiles of each species ($C_A$, $C_B$, and $C_C$) along the space coordinate.
+where the reaction rates are computed as $r_1 = k_1 C_A^2$, and $r_2 = k_2 C_B$, respectively. Solve the problem in order to find the concentration profiles of each species ($C_A$, $C_B$, and $C_C$) along the space coordinate. At the inlet section, $C_A (x=0) = 1\text{ }kmol/m^3$, while the other concentrations are null.
 
 * **Methodology:** Solve the problem using three different methods: i) time explicit integration; ii) time implicit with linearization of the reactive terms; iii) operator splitting. 
 * **Key Tests:** focus on the implementation technique, the stability of the system for each solution method and their underlying assumptions, and compare the simulation times.
