@@ -58,7 +58,7 @@ global k1 k2;
 
 L = 2;
 tau = 5;
-ncells = 100;
+ncells = 200;
 u = 1;
 Dmix = 1.e-2;
 k1 = 10;
@@ -98,13 +98,10 @@ fprintf ("Selected time step                           = %f\n", dt);
 % Memory Allocations
 %-------------------------------------------------------------------------%
 
-CA = zeros(1, ncells+2);
-CB = zeros(1, ncells+2);
-CC = zeros(1, ncells+2);
+ZERO = zeros(1, ncells+2);
 
-RA = zeros(1, ncells+2);
-RB = zeros(1, ncells+2);
-RC = zeros(1, ncells+2);
+CA = ZERO; CB = ZERO; CC = ZERO;
+RA = ZERO; RB = ZERO; RC = ZERO;
 
 CAo = CA; CBo = CB; CCo = CC;
 
@@ -163,8 +160,9 @@ for is=1:nsteps
         plot (x, CBp, "LineWidth", 1.8);
         plot (x, CCp, "LineWidth", 1.8);
         xlabel ("lenght [m]"); ylabel ("Concentration [kmol/m3]");
-        % legend ("CA", "CB", "CC");
+        legend ("CA", "CB", "CC");
         xlim([0 L]); ylim([0 1]);
+        grid on;
         drawnow;
     end
 
@@ -193,11 +191,11 @@ function C = AdvectionDiffusionReaction1D (C, S, u, Dmix, dt, h, ncells)
 
     Co = C;
     for i=2:ncells+1
-        Ai = u*h/2*(Co(i+1) - Co(i-1));
-        Di = Dmix*(Co(i+1) + Co(i-1) - 2*Co(i));
-        Ri = S(i);
+        Ai = u*h^2/2*(Co(i+1) - Co(i-1));
+        Di = Dmix*h*(Co(i+1) + Co(i-1) - 2*Co(i));
+        Ri = S(i)*h^3;
 
-        C(i) = Co(i) + dt/h^2*(-Ai + Di + Ri);
+        C(i) = Co(i) + dt/h^3*(-Ai + Di + Ri);
     end
 
 end
