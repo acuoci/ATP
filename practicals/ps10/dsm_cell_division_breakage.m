@@ -111,7 +111,7 @@ function dN = ODESystem(~, N, r, kG, r0)
     end
 
     dN = zeros(M,1);
-    dN(1) = -Ldot*f(2) + integ*dirac(0.5*r0, r(2), r(1)) - kG*heaviside(rh-r0)*N(1);
+    dN(1) = -Ldot*f(2);
     for i=2:M-1
         rh = 0.5*(r(i+1) + r(i));
         % dN(i) = 0 ...
@@ -119,7 +119,7 @@ function dN = ODESystem(~, N, r, kG, r0)
             + integ*dirac(0.5*r0, r(i+1), r(i)) ...
             - kG*heaviside(rh-r0)*N(i);
     end
-    dN(M) = Ldot*f(M) + integ*dirac(0.5*r0, r(M), r(M-1)) - kG*heaviside(rh-r0)*N(M);
+    dN(M) = Ldot*f(M);
 end
 
 function delta = dirac(r0, rr, rl)
