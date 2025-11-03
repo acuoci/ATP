@@ -75,10 +75,18 @@ fprintf(' - Diffusion:  %f\n', dt_diff);
 fprintf(' - Convection: %f\n', dt_conv);
 
 % Memory allocation
-% [TBC]
+psi = zeros(nx,ny);
+omega = zeros(nx,ny);
+omegao = zeros(nx,ny);
+u = zeros(nx,ny);   % u = U/uwall
+v = zeros(nx,ny);   % v = V/uwall
+U = zeros(nx,ny);   % U = u*uwall
+V = zeros(nx,ny);   % V = v*uwall
 
 % Mesh construction (only needed in graphical post-processing)
-% [TBC]
+x=0:h:1;    % XX = x*L (physical coordinates)
+y=0:h:1;    % YY = y*L (physical coordinates)
+[X,Y] = meshgrid(x,y);  % dimensionless MATLAB grid
 
 % Time loop
 t = 0;
@@ -87,17 +95,29 @@ for istep=1:nsteps
     % ------------------------------------------------------------------- %
     % Poisson equation (SOR)
     % ------------------------------------------------------------------- %
-    % [TBC]
-    
+    [psi, iter] = Poisson2D(psi, nx, ny, h, omega, beta, max_iterations, max_error);
+
     % ------------------------------------------------------------------- %
     % Find vorticity on boundaries
     % ------------------------------------------------------------------- %
-    % [TBC]
+    omega(2:nx-1,ny) = -2.*psi(2:nx-1,ny-1)/h^2 -2./h*1;
+    omega(2:nx-1,1)  = -2.*psi(2:nx-1,2)/h^2 ;
+    omega(1,2:ny-1)  = -2.*psi(2,2:ny-1)/h^2 ;
+    omega(nx,2:ny-1) = -2.*psi(nx-1,2:ny-1)/h^2 ;
   
     % ------------------------------------------------------------------- %
     % Find new vorticity in interior points
     % ------------------------------------------------------------------- %
-    % [TBC]
+    omegao = omega;
+    for i=2:nx-1
+        for j=2:ny-1
+omega(i,j)=omegao(i,j)+dt*(-0.25*((psi(i,j+1)-psi(i,j-1))*...
+                    (omegao(i+1,j)-omegao(i-1,j))-(psi(i+1,j)-psi(i-1,j))*...
+                    (omegao(i,j+1)-omegao(i,j-1)))/(h*h)+...
+                    1/Re*(omegao(i+1,j)+omegao(i-1,j)+omegao(i,j+1)+...
+                    omegao(i,j-1)-4.0*omegao(i,j))/(h^2) );
+        end
+    end
    
     if (mod(istep,25)==1)
         fprintf('Step: %d - Time: %f - Poisson iterations: %d\n', istep, t, iter);
@@ -108,7 +128,13 @@ for istep=1:nsteps
     % ------------------------------------------------------------------- %
     % Reconstruction of dimensionless velocity field
     % ------------------------------------------------------------------- % 
-    % [TBC]
+    u(1:nx,ny) = 1.;
+    for i=2:nx-1
+        for j=2:ny-1
+            u(i,j) =  (psi(i,j+1) - psi(i,j-1)) / (2*h);
+            v(i,j) = -(psi(i+1,j) - psi(i-1,j)) / (2*h);
+        end
+    end
     
     % ------------------------------------------------------------------- %
     % Reconstruction of velocity field
@@ -119,11 +145,13 @@ for istep=1:nsteps
     % ------------------------------------------------------------------- %
     % Graphics only
     % ------------------------------------------------------------------- %
-    plot_2x4 = false;   % plotting the 2x4 plot
+    plot_2x4 = true;   % plotting the 2x4 plot
     
     if (plot_2x4 == true)
         
-        % [TBC]
+        subplot(241);
+        contour(x,y,omega');
+        axis('square'); title('omega'); xlabel('x'); ylabel('y');
 
         subplot(245);
         contour(x,y,psi');
@@ -168,7 +196,9 @@ end
 % Write final maps
 % ------------------------------------------------------------------- %
 
-% [TBC]
+subplot(231);
+surface(x,y,u');
+axis('square'); title('u'); xlabel('x'); ylabel('y');
 
 subplot(234);
 surface(x,y,v');
