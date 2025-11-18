@@ -99,10 +99,13 @@ y=0:h:L;                         % grid coordinates (y axis)
 % ----------------------------------------------------------------------- %
 
 % Main fields (velocities and pressure)
-% [TBC]
+u = zeros(nx+1,ny+2);
+v = zeros(nx+2,ny+1);
+p = zeros(nx+2,ny+2);
 
 % Temporary velocity fields
-% [TBC]
+ut = zeros(nx+1,ny+2); 
+vt = zeros(nx+2,ny+1);
 
 % Fields used only for graphical post-processing purposes
 uu=zeros(nx+1,ny+1);
@@ -121,8 +124,16 @@ t=0.0;
 for is=1:nsteps
     
     % Boundary conditions
-    % [TBC]
-    
+    % W,E: u already prescribed (u=0)
+    % N,S: v already prescribed (v=0)
+    % W,E: v must be prescribed
+    % N,S: u must be prescribed
+
+    u(1:nx+1,1) = 2*us-u(1:nx+1,2);
+    u(1:nx+1,ny+2) = 2*un-u(1:nx+1,ny+1);
+    v(1,:) = 2*vw-v(2,:);
+    v(nx+2,:) = 2*ve-v(nx+1,:);
+
     % Advection-diffusion equation (predictor)
     [ut, vt] = AdvectionDiffusion2D( ut, vt, u, v, nx, ny, h, dt, nu);
     
@@ -131,8 +142,17 @@ for is=1:nsteps
                            beta, max_iterations, max_error );
     
     % Correction on the velocity
-    % [TBC]
-    
+    for i=2:nx
+        for j=2:ny+1
+            u(i,j) = ut(i,j) -dt/h*(p(i+1,j)-p(i,j));
+        end
+    end
+    for i=2:nx+1
+        for j=2:ny
+            v(i,j) = vt(i,j) -dt/h*(p(i,j+1)-p(i,j));
+        end
+    end
+
     % Print on the screen
     if (mod(is,50)==1)
         fprintf('Step: %d - Time: %f - Poisson iterations: %d\n', is, t, iter);
@@ -259,7 +279,9 @@ function [p, iter] = Poisson2D( p, ut, vt, gamma, nx, ny, h, dt, ...
         for i=2:nx+1
             for j=2:ny+1
                 
-                % [TBC]
+                delta = p(i+1,j)+p(i-1,j)+p(i,j+1)+p(i,j-1);
+                S = (ut(i,j)-ut(i-1,j)+vt(i,j)-vt(i,j-1))*h/dt;
+                p(i,j) = beta*(delta-S)*gamma(i,j) + (1-beta)*p(i,j);
                 
             end
         end
@@ -268,9 +290,10 @@ function [p, iter] = Poisson2D( p, ut, vt, gamma, nx, ny, h, dt, ...
         epsilon=0.0; 
         for i=2:nx+1
             for j=2:ny+1
-                
-                % [TBC]
-
+                delta = p(i+1,j)+p(i-1,j)+p(i,j+1)+p(i,j-1);
+                S = (ut(i,j)-ut(i-1,j)+vt(i,j)-vt(i,j-1))*h/dt; 
+                res = -p(i,j)+beta*(delta-S)*gamma(i,j) + (1-beta)*p(i,j);
+                epsilon = epsilon + abs(res);
             end
         end
         epsilon = epsilon / (nx*ny);
@@ -293,7 +316,16 @@ function [ut, vt] = AdvectionDiffusion2D( ut, vt, u, v, nx, ny, h, dt, nu)
     for i=2:nx
         for j=2:ny+1 
             
-            % [TBC]
+            ue2 = ( (u(i+1,j)+u(i,j))/2 )^2;
+            uw2 = ( (u(i-1,j)+u(i,j))/2 )^2;
+            uvn =   (u(i,j+1)+u(i,j))/2 * (v(i+1,j)+v(i,j))/2;
+            uvs =   (u(i,j-1)+u(i,j))/2 * (v(i+1,j-1)+v(i,j-1))/2;
+            
+            A = (ue2-uw2 + uvn-uvs)/h;
+            D = (nu/h^2)*( u(i+1,j)+u(i-1,j) + ...
+                           u(i,j+1)+u(i,j-1) - 4*u(i,j)) ;
+            
+            ut(i,j) = u(i,j) + dt*(D-A);
             
         end
     end
@@ -302,7 +334,16 @@ function [ut, vt] = AdvectionDiffusion2D( ut, vt, u, v, nx, ny, h, dt, nu)
     for i=2:nx+1
         for j=2:ny 
             
-            % [TBC]
+            vn2 = ( (v(i,j)+v(i,j+1))/2 )^2;
+            vs2 = ( (v(i,j)+v(i,j-1))/2 )^2;
+            vue = (v(i,j)+v(i+1,j))/2 * (u(i,j)+u(i,j+1))/2 ;
+            vuw = (v(i,j)+v(i-1,j))/2 * (u(i-1,j)+u(i-1,j+1))/2 ;
+
+            A = (vn2-vs2+vue-vuw)/h;
+            D = (nu/h^2)*( v(i+1,j)+v(i-1,j) + ...
+                           v(i,j+1)+v(i,j-1) - 4*v(i,j)) ;            
+
+            vt(i,j) = v(i,j) + dt*(D-A);
             
         end
     end
