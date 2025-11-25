@@ -39,7 +39,10 @@
 %  Code: 2D driven-cavity problem on a staggered grid                     %
 %        Transport equation for species A (with reaction A+B->C)          %
 %        Second order reaction: r=kappa*CA*CB                             %
-%        Operator splitting approach (1st order)                          %
+%        Implicit Backward Euler method + linearization of source term +  %
+%        segregation of species                                           %
+%        The solution of pentadiagonal system of equations is carried out %
+%        without exploiting any sparsity                                  %
 %                                                                         %
 % ----------------------------------------------------------------------- %
 close all;
@@ -54,7 +57,7 @@ nx=24;      % number of (physical) cells along x
 ny=nx;      % number of (physical) cells along y
 L=1;        % length [m]
 nu=0.01;    % kinematic viscosity [m2/s] (if L=1 and un=1, then Re=1/nu)
-tau=30;     % total time of simulation [s]
+tau=10;     % total time of simulation [s]
 
 % Boundary conditions
 un=1;       % north wall velocity [m/s]
@@ -80,25 +83,18 @@ kappa = 100;            % kinetic constant [m3/kmol/s]
 % Grid step
 h=L/nx;                                 % grid step (uniform grid) [m]
 
-% Time step (stability conditions)
+% Time step
 sigma = 0.5;                            % safety factor for time step (stability)
-
 dt_diff_ns=h^2/4/nu;                    % time step (diffusion stability) [s]
 dt_conv_ns=4*nu/un^2;                   % time step (convection stability) [s]
 dt_ns=min(dt_diff_ns, dt_conv_ns);      % time step (stability) [s]
-
 dt_diff_sp=h^2/4/Gamma;                 % time step (species diffusion stability) [s]
 dt_conv_sp=4*Gamma/un^2;                % time step (species convection stability) [s]
-
 dt_sp=min(dt_conv_sp, dt_diff_sp);      % time step (stability) [s]
 dt_reac=1/kappa/(CAin+CBin);            % time step (stability) [s]
 
-dt=sigma*min(dt_ns,min(dt_sp));         % time step (stability) [s]
-
-% Number of steps
+dt=sigma*dt_ns;                         % time step (stability based on momentum equations only) [s]
 nsteps=tau/dt;                          % number of steps
-
-% Reynolds' number
 Re = un*L/nu;                           % Reynolds' number
 
 % Summary on the screen
@@ -120,15 +116,12 @@ y=0:h:1;                % grid coordinates (y axis)
 % ----------------------------------------------------------------------- %
 
 % Main fields (velocities and pressure)
-u = zeros(nx+1, ny+2);
-v = zeros(nx+2, ny+1);
-p = zeros(nx+2, ny+2);
-CA = zeros(nx+2, ny+2);
-CB = zeros(nx+2, ny+2);
-CC = zeros(nx+2, ny+2);
-CAstar = zeros(nx+2, ny+2);
-CBstar = zeros(nx+2, ny+2);
-CCstar = zeros(nx+2, ny+2);
+u=zeros(nx+1,ny+2);
+v=zeros(nx+2,ny+1);
+p=zeros(nx+2,ny+2);
+CA=zeros(nx+2,ny+2);
+CB=zeros(nx+2,ny+2);
+CC=zeros(nx+2,ny+2);
 
 % Temporary velocity fields
 ut=zeros(nx+1,ny+2);
@@ -146,7 +139,8 @@ gamma=zeros(nx+2,ny+2)+1/4;
 gamma(2,3:ny)=1/3;gamma(nx+1,3:ny)=1/3;gamma(3:nx,2)=1/3;gamma(3:nx,ny+1)=1/3;
 gamma(2,2)=1/2;gamma(2,ny+1)=1/2;gamma(nx+1,2)=1/2;gamma(nx+1,ny+1)=1/2;
 
-ne=(nx+2)*(ny+2);   
+% Total number of equations for a single scalar
+ne=(nx+2)*(ny+2);
 
 % ----------------------------------------------------------------------- %
 % Solution over time
@@ -191,92 +185,78 @@ for is=1:nsteps
     CC = ImpermeableWallsBoundaryConditions(CC, nx,ny); 
     
     % Porous inlet (west)
-    CA(1,ny*2/4:ny*3/4)  = 2*CAin - CA(2,ny*2/4:ny*3/4);
-    CB(1,ny*2/4:ny*3/4)  = 2*0    - CB(2,ny*2/4:ny*3/4);
-    CC(1,ny*2/4:ny*3/4)  = 2*0    - CC(2,ny*2/4:ny*3/4);
+    CA(1,ny/2:3/4*ny)=2*CAin-CA(2,ny/2:3/4*ny);
+    CB(1,ny/2:3/4*ny)=2*0-CB(2,ny/2:3/4*ny);
+    CC(1,ny/2:3/4*ny)=2*0-CC(2,ny/2:3/4*ny);
 
     % Porous inlet (east)
-    CA(nx+2,ny*1/4:ny*2/4) = 2*0    - CA(nx+1,ny*1/4:ny*2/4);
-    CB(nx+2,ny*1/4:ny*2/4) = 2*CBin - CB(nx+1,ny*1/4:ny*2/4);
-    CC(nx+2,ny*1/4:ny*2/4) = 2*0    - CC(nx+1,ny*1/4:ny*2/4);
-
+    CA(nx+2,ny/4:ny/2)=2*0-CA(nx+1,ny/4:ny/2);
+    CB(nx+2,ny/4:ny/2)=2*CBin-CB(nx+1,ny/4:ny/2);
+    CC(nx+2,ny/4:ny/2)=2*0-CC(nx+1,ny/4:ny/2);
     
-    % [OPERATOR-SPLITTING] Concentration of species
+
+    % Concentration of species
 
     tStart = cputime;   % track cpu time
 
-    % Transport step (explicit, segregated)
-    CAstar = AdvectionDiffusion(CA, u,v, dt,h, Gamma, nx,ny);
-    CBstar = AdvectionDiffusion(CB, u,v, dt,h, Gamma, nx,ny);
-    CCstar = AdvectionDiffusion(CC, u,v, dt,h, Gamma, nx,ny);
-
-    % Chemical step (coupled)
-    method = 1;
+    % 1. Storing current values
+    CAo = CA;
+    CBo = CB;
+    CCo = CC;
+    
+    % 2. Setting the matrix M (common to every species)
+    M = eye(ne,ne);
     for i=2:nx+1
             for j=2:ny+1
                 
-                % Method 1: Explicit method
-                %           Also called local time stepping (LTS)
-                if (method==1)
-                    
-                    % Local time step
-                    dt_chem=1/kappa/(CAstar(i,j)+CBstar(i,j)+1e-7);
-                    n_steps_chem = ceil(dt/dt_chem);
-                    dt_chem = dt/(n_steps_chem);
-
-                    for k=1:n_steps_chem
-                        r = kappa*CAstar(i,j)*CBstar(i,j);
-                        CAstar(i,j) = CAstar(i,j) -r*dt_chem;
-                        CBstar(i,j) = CBstar(i,j) -r*dt_chem;
-                        CCstar(i,j) = CCstar(i,j) +r*dt_chem;
-                    end
-
-                    CA(i,j) = CAstar(i,j);
-                    CB(i,j) = CBstar(i,j);
-                    CC(i,j) = CCstar(i,j);
+                k = (nx+2)*(j-1)+i;
                 
-                % Method 2: Linearization
-                elseif (method == 2)
+                ue = u(i,j);    uw = u(i-1,j);
+                vn = v(i,j);    vs = v(i,j-1);
                 
-                    % [TBC]
- 
-                % Method 3: Analytical solution (only for very simple cases)
-                elseif (method == 3)
-            
-                    if (CAstar(i,j)>1.e-32 && CBstar(i,j)>1.e-32)
-                        
-                        CA0 = CAstar(i,j);
-                        CB0 = CBstar(i,j);
-                        CC0 = CCstar(i,j);
-
-                        CA(i,j) = (exp(log(CA0/CB0) + CA0*kappa*dt - CB0*kappa*dt)*(CA0 - CB0)) / ...
-                                       (exp(log(CA0/CB0) + CA0*kappa*dt - CB0*kappa*dt) - 1);
-                        CB(i,j) = CB0-(CA0-CA(i,j));
-                        CC(i,j) = CC0+(CA0-CA(i,j));
-                    
-                    else
-                        
-                        CA(i,j) = CAstar(i,j);
-                        CB(i,j) = CBstar(i,j);
-                        CC(i,j) = CCstar(i,j);
-                        
-                    end
-
-                % Method 4: ODE solver
-                elseif (method == 4)
-
-                    [tLocal, Clocal] = ode45(@LocalBatch, [t,t+dt], ...
-                               [CAstar(i,j),CBstar(i,j),CCstar(i,j)], ...
-                               [], kappa);
-
-                    CA(i,j) = Clocal(end,1);
-                    CB(i,j) = Clocal(end,2);
-                    CC(i,j) = Clocal(end,3);
-                  
-                end
-
+                M(k,k)   = 1 + 4*Gamma*dt/h/h;
+                M(k,k+1) = dt*( ue/2/h-Gamma/h^2);
+                M(k,k-1) = dt*(-uw/2/h-Gamma/h^2);
+                M(k,k+nx+2) = dt*( vn/2/h-Gamma/h^2);
+                M(k,k-nx-2) = dt*(-vs/2/h-Gamma/h^2);                
+                
             end
-    end    
+    end
+
+    % 3. Setting the matrices for single species
+    MA = M; MB = M; MC = M;
+    for i=2:nx+1
+            for j=2:ny+1
+                
+                k = (nx+2)*(j-1)+i;
+                
+                MA(k,k) = MA(k,k) + dt*kappa*CBo(i,j);
+                MB(k,k) = MB(k,k) + dt*kappa*CAo(i,j);
+            end
+    end
+
+    % 4. Setting the RHS vectors
+    bA=CAo(:);
+    bB=CBo(:);
+    bC=CCo(:);
+    
+    % 5. Setting the RHS vectors for single species
+    for i=2:nx+1
+            for j=2:ny+1
+                k = (nx+2)*(j-1)+i;
+                bC(k) = bC(k) + dt*kappa*CAo(i,j)*CBo(i,j);
+            end
+    end
+    
+    % 6. Solve the linear systems
+    CA = MA\bA;
+    CB = MB\bB;
+    CC = MC\bC;
+    
+    % 7. Reshape the solution
+    CA = reshape(CA, [nx+2 ny+2]);
+    CB = reshape(CB, [nx+2 ny+2]);
+    CC = reshape(CC, [nx+2 ny+2]);    
 
     tEnd = cputime;   % track cpu time
 
@@ -466,30 +446,6 @@ function [p, it] = PoissonSolver(p, ut,vt, dt,h, nx,ny, gamma, beta, max_iterati
 end
 
 
-% Advection-Diffusion Equation Solver (Explicit)
-function [phi] = AdvectionDiffusion(phi, u,v, dt,h, Gamma, nx,ny)
-
-    % Main loop
-    phio = phi;
-    for i=2:nx+1
-            for j=2:ny+1
-                
-                ue = u(i,j);    uw = u(i-1,j);
-                vn = v(i,j);    vs = v(i,j-1);
-
-                phi(i,j) = phio(i,j) + dt * (...
-                    (-ue/2/h+Gamma/h^2)*phio(i+1,j) + ...
-                    ( uw/2/h+Gamma/h^2)*phio(i-1,j) + ...
-                    (-vn/2/h+Gamma/h^2)*phio(i,j+1) + ...
-                    ( vs/2/h+Gamma/h^2)*phio(i,j-1) + ...
-                    -4*Gamma/h^2*phio(i,j) ); 
-                        
-            end
-    end
-
-end
-
-
 % Reconstruct scalar field on a grid for graphical purposes
 function [phir] = ReconstructScalarField(phi, nx,ny)
     
@@ -501,21 +457,9 @@ end
 % Set the boundary conditions on impermeable walls for scalars
 function [phi] = ImpermeableWallsBoundaryConditions(phi, nx,ny)
 
-    phi(1,2:ny+1) = phi(2,2:ny+1);  % west
-    phi(2:nx+1,1) = phi(2:nx+1,2);  % south
-
-    phi(nx+2,2:ny+1) = phi(nx+1,2:ny+1);  % east
-    phi(2:nx+1,ny+2) = phi(2:nx+1,ny+1);  % north
-    
-end
-
-function dCoverdt = LocalBatch(t,C, kappa)
-
-    CA = C(1);
-    CB = C(2);
-
-    r = kappa*CA*CB;
-
-    dCoverdt = [-r, -r, r]';
+    phi(2:nx+1,1)=phi(2:nx+1,2);          
+    phi(2:nx+1,ny+2)=phi(2:nx+1,ny+1);    
+    phi(1,2:ny+1)=phi(2,2:ny+1);          
+    phi(nx+2,2:ny+1)=phi(nx+1,2:ny+1); 
 
 end
