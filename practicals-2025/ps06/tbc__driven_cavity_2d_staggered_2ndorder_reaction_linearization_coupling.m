@@ -205,31 +205,90 @@ for is=1:nsteps
     CCo = CC;
     
     % 2. Setting the matrix M (common to every species)
-    % [TBC]
+    M = eye(ne,ne);
+    for i=2:nx+1
+        for j=2:ny+1
+            
+            k = (nx+2)*(j-1)+i;
+
+            ue = u(i,j); uw = u(i-1,j);
+            vn = v(i,j); vs = v(i,j-1);
+
+            M(k,k) = 1 + 4*Gamma*dt/h^2;            % Ap on the blackboard 
+            M(k,k+1) = ue*dt/2/h - Gamma*dt/h^2;    % Ae
+            M(k,k-1) =-uw*dt/2/h - Gamma*dt/h^2;    % Aw
+            M(k,k+nx+2) = vn*dt/2/h - Gamma*dt/h^2; % An
+            M(k,k-nx-2) =-vs*dt/2/h - Gamma*dt/h^2; % As
+            
+        end
+    end
 
     % 3. Setting the matrices for single species
-    % [TBC]
+    MA = M; MB = M; MC = M;
+    for i=2:nx+1
+        for j=2:ny+1
+            k = (nx+2)*(j-1)+i;
+            MA(k,k) = MA(k,k) + dt*kappa*CBo(i,j);
+            MB(k,k) = MB(k,k) + dt*kappa*CAo(i,j);            
+        end
+    end
 
     % 4. Assembling fully-coupled matrix
-    % [TBC]
-
+    MM = zeros(3*ne, 3*ne);
+    MM(1:ne,1:ne) = MA;
+    MM(ne+1:2*ne,ne+1:2*ne) = MB;
+    MM(2*ne+1:3*ne,2*ne+1:3*ne) = MC;
+    
     % 5. Adding coupling terms
-    % [TBC]
+    for i=2:nx+1
+        for j=2:ny+1
+            k = (nx+2)*(j-1)+i;
+
+            MM(k,k+ne) = MM(k,k+ne) + dt*kappa*CAo(i,j);
+            MM(k+ne,k) = MM(k+ne,k) + dt*kappa*CBo(i,j);
+            MM(k+2*ne,k) = MM(k+2*ne,k) - dt*kappa*CBo(i,j);
+            MM(k+2*ne,k+ne) = MM(k+2*ne,k+ne) - dt*kappa*CAo(i,j);
+        end
+    end
 
     % 6. Setting the RHS vectors
-    % [TBC]
+    bA = CAo(:);
+    bB = CBo(:);
+    bC = CCo(:);
     
     % 7. Setting the RHS vectors for single species
-    % [TBC]
+    for i=2:nx+1
+        for j=2:ny+1
+            k = (nx+2)*(j-1)+i;
+            bA(k) = bA(k) + dt*kappa*CAo(i,j)*CBo(i,j);
+            bB(k) = bB(k) + dt*kappa*CAo(i,j)*CBo(i,j);
+            bC(k) = bC(k) - dt*kappa*CAo(i,j)*CBo(i,j);
+        end
+    end
     
     % 8. Assembling fully-coupled vector
-    % [TBC]
+    bb = zeros(3*ne,1);
+    bb(1:ne) = bA;
+    bb(1+ne:2*ne) = bB;
+    bb(1+2*ne:3*ne) = bC;
     
     % 9. Solve the linear system
-    % [TBC]
+    % C = MM\bb;
+    C0 = zeros(3*ne,1);
+    C0(1:ne) = CAo(:);
+    C0(1+ne:2*ne) = CBo(:);
+    C0(1+2*ne:3*ne) = CCo(:);
+    
+    C = gmres(MM,bb,[],[],[],[],[],C0);
+
+    CA = C(1:ne);
+    CB = C(1+ne:2*ne);
+    CC = C(1+2*ne:3*ne);
     
     % 10. Reshape the solution
-    % [TBC]    
+    CA = reshape(CA, [nx+2, ny+2]);
+    CB = reshape(CB, [nx+2, ny+2]);
+    CC = reshape(CC, [nx+2, ny+2]);
 
     tEnd = cputime;   % track cpu time
 

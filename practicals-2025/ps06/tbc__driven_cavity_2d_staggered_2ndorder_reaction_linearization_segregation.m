@@ -205,23 +205,58 @@ for is=1:nsteps
     CCo = CC;
     
     % 2. Setting the matrix M (common to every species)
-    % [TBC]
+    M = eye(ne,ne);
+    for i=2:nx+1
+        for j=2:ny+1
+            
+            k = (nx+2)*(j-1)+i;
+
+            ue = u(i,j); uw = u(i-1,j);
+            vn = v(i,j); vs = v(i,j-1);
+
+            M(k,k) = 1 + 4*Gamma*dt/h^2;              % Ap on the blackboard 
+            M(k,k+1) = ue*dt/2/h - Gamma*dt/h^2;    % Ae
+            M(k,k-1) =-uw*dt/2/h - Gamma*dt/h^2;    % Aw
+            M(k,k+nx+2) = vn*dt/2/h - Gamma*dt/h^2; % An
+            M(k,k-nx-2) =-vs*dt/2/h - Gamma*dt/h^2; % As
+            
+        end
+    end
+
 
     % 3. Setting the matrices for single species
-    % [TBC]
+    MA = M; MB = M; MC = M;
+    for i=2:nx+1
+        for j=2:ny+1
+            k = (nx+2)*(j-1)+i;
+            MA(k,k) = MA(k,k) + dt*kappa*CBo(i,j);
+            MB(k,k) = MB(k,k) + dt*kappa*CAo(i,j);            
+        end
+    end
 
     % 4. Setting the RHS vectors
-    % [TBC]
+    bA = CAo(:);
+    bB = CBo(:);
+    bC = CCo(:);
     
     % 5. Setting the RHS vectors for single species
-    % [TBC]
+    for i=2:nx+1
+        for j=2:ny+1
+            k = (nx+2)*(j-1)+i;
+            bC(k) = bC(k) + dt*kappa*CAo(i,j)*CBo(i,j);
+        end
+    end
     
     % 6. Solve the linear systems
-    % [TBC]
+    CA = MA\bA;
+    CB = MB\bB; 
+    CC = MC\bC; 
     
     % 7. Reshape the solution
-    % [TBC]  
-
+    CA = reshape(CA, [nx+2, ny+2]);
+    CB = reshape(CB, [nx+2, ny+2]);
+    CC = reshape(CC, [nx+2, ny+2]);
+    
     tEnd = cputime;   % track cpu time
 
     % Print info on the screen
