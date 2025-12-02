@@ -135,7 +135,8 @@ gamma=zeros(nx+2,ny+2)+1/4;
 gamma(2,3:ny)=1/3;gamma(nx+1,3:ny)=1/3;gamma(3:nx,2)=1/3;gamma(3:nx,ny+1)=1/3;
 gamma(2,2)=1/2;gamma(2,ny+1)=1/2;gamma(nx+1,2)=1/2;gamma(nx+1,ny+1)=1/2;
 
-% [INOUT] Correction of gamma coefficients for taking into account out sections
+% [INOUT] Correction of gamma coefficients for taking into account in/out sections
+gamma(1,nin_start:nin_end) = 1/4;
 gamma(nx+1,nout_start:nout_end) = 1/4;
 
 % [INOUT] Initial conditions
