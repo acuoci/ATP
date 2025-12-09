@@ -49,7 +49,7 @@ clear variables;
 % ----------------------------------------------------------------------- %
 
 % Only even numbers of cells are acceptable
-nx=32;              % number of (physical) cells along x
+nx=200;             % number of (physical) cells along x
 ny=nx;              % number of (physical) cells along y
 L=1;                % length [m]
 nu=0.01;            % laminar kinematic viscosity [m2/s] 
@@ -344,13 +344,19 @@ function nut = TurbulentViscosity( u, v, nx, ny, h )
             vw = (vnw + vsw)/2;
             
             % Strain rate components
-            % [TBC]
-            
+            du_dx = (ue-uw)/h;
+            du_dy = (un-us)/h;
+            dv_dx = (ve-vw)/h;
+            dv_dy = (vn-vs)/h;
+           
             % Strain rate tensor magnitude: |S| = sqrt(2*Sij*Sij)
-            % [TBC]
+            Sxx = 1/2*(du_dx+du_dx);
+            Syy = 1/2*(dv_dy+dv_dy);
+            Sxy = 1/2*(du_dy+dv_dx);
+            S = sqrt(2*(Sxx^2 + Syy^2 + 2*Sxy^2));
             
             % Smagorinsky eddy viscosity
-            nut(i,j) = % [TBC]
+            nut(i,j) = (Cs*Delta)^2 * S;
 
         end
     end

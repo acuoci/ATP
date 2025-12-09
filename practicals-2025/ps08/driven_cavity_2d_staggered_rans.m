@@ -137,7 +137,7 @@ t=0.0;
 for is=1:nsteps
     
     % Update the turbulent viscosity (Prandtl k-l model)
-    nut = TurbulentViscosity( kappa, nx, ny, h);
+    nut = TurbulentViscosity( kappa, nx, ny, h, L);
                 
     % Boundary conditions (velocity)
     u(1:nx+1,1)=2*us-u(1:nx+1,2);
@@ -174,7 +174,7 @@ for is=1:nsteps
     kappa(nx+2,2:ny+1)=2*kappae-kappa(nx+1,2:ny+1);
     
     % Update passive scalar solution
-    [kappa] = AdvectionDiffusion2DTurbulentKineticEnergy( kappa, u, v, nx, ny, h, dt, nu, nut);
+    [kappa] = AdvectionDiffusion2DTurbulentKineticEnergy( kappa, u, v, nx, ny, h, L, dt, nu, nut);
   
     % Advance time
     t=t+dt;
@@ -325,7 +325,7 @@ end
 % --------------------------------------------------------------------------------------
 % Turbulent viscosity
 % --------------------------------------------------------------------------------------
-function nut = TurbulentViscosity( kappa, nx, ny, h)
+function nut = TurbulentViscosity( kappa, nx, ny, h, L)
 
     % Constants
     Cmu = 0.09;
@@ -334,13 +334,14 @@ function nut = TurbulentViscosity( kappa, nx, ny, h)
     for i=2:nx+1
         for j=2:ny+1
 
-            % Distance from the wall
-            dx = (i-2)*h + h/2;
-            dy = (j-2)*h + h/2;
-            lw = min(dx,dy);
-            
-            % Turbulent viscosity
-            nut(i,j) = sqrt( max(kappa(i,j),0.) ) * (Cmu*lw);
+            x = (i-3/2)*h;
+            y = (j-3/2)*h;
+            lx = min (x, L-x);
+            ly = min (y, L-y);
+            lw = min (lx, ly);
+
+            l = Cmu*lw;
+            nut(i,j) = sqrt(max(kappa(i,j),0.)) * l;
 
         end
     end
@@ -350,7 +351,7 @@ end
 % --------------------------------------------------------------------------------------
 % Advection-diffusion equation for turbulent kinetic energy
 % --------------------------------------------------------------------------------------
-function [kappa] = AdvectionDiffusion2DTurbulentKineticEnergy( kappa, u, v, nx, ny, h, dt, nu, nut)
+function [kappa] = AdvectionDiffusion2DTurbulentKineticEnergy( kappa, u, v, nx, ny, h, L, dt, nu, nut)
 
     % Constants
     sigmak = 1.0;
@@ -361,10 +362,14 @@ function [kappa] = AdvectionDiffusion2DTurbulentKineticEnergy( kappa, u, v, nx, 
     for i=2:nx+1
             for j=2:ny+1
                 
-                % Distance from the wall
-                dx = (i-2)*h + h/2;
-                dy = (j-2)*h + h/2;
-                lw = min(dx,dy);
+                x = (i-3/2)*h;
+                y = (j-3/2)*h;
+                lx = min (x, L-x);
+                ly = min (y, L-y);
+                lw = min (lx, ly);
+    
+                l = Cmu*lw;
+                nut(i,j) = sqrt(max(kappa(i,j),0.)) * l;
                 
                 % Total viscosity
                 nutot = nu + nut(i,j)/sigmak;

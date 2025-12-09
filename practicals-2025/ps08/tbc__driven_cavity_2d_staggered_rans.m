@@ -115,7 +115,8 @@ v=zeros(nx+2,ny+1);
 p=zeros(nx+2,ny+2);
 
 % [RANS] turbulent fields
-% [TBC]
+kappa=zeros(nx+2,ny+2);
+nut=zeros(nx+2,ny+2);
 
 % Temporary velocity fields
 ut=zeros(nx+1,ny+2);
@@ -147,7 +148,7 @@ for is=1:nsteps
     v(nx+2,1:ny+1)=2*ve-v(nx+1,1:ny+1);
     
     % Advection-diffusion equation (predictor)
-    [ut, vt] = AdvectionDiffusion2D( ut, vt, u, v, nx, ny, h, dt, nu);
+    [ut, vt] = AdvectionDiffusion2D( ut, vt, u, v, nx, ny, h, dt, nu, nut);
     
     % Pressure equation (Poisson)
     [p, iter] = Poisson2D( p, ut, vt, c, nx, ny, h, dt, ...
@@ -282,13 +283,13 @@ end
 % --------------------------------------------------------------------------------------
 % Advection-diffusion equation
 % --------------------------------------------------------------------------------------
-function [ut, vt] = AdvectionDiffusion2D( ut, vt, u, v, nx, ny, h, dt, nu)
+function [ut, vt] = AdvectionDiffusion2D( ut, vt, u, v, nx, ny, h, dt, nu, nut)
                             
     % Temporary u-velocity
     for i=2:nx
         for j=2:ny+1 
             
-            % [TBC]
+            nutot = nu + nut(i,j);
             
             ue2 = 0.25*( u(i+1,j)+u(i,j) )^2;
             uw2 = 0.25*( u(i,j)+u(i-1,j) )^2;
@@ -296,7 +297,7 @@ function [ut, vt] = AdvectionDiffusion2D( ut, vt, u, v, nx, ny, h, dt, nu)
             usv = 0.25*( u(i,j)+u(i,j-1) )*( v(i+1,j-1)+v(i,j-1) );
             
             A = (ue2-uw2+unv-usv)/h;
-            D = (nu/h^2)*(u(i+1,j)+u(i-1,j)+u(i,j+1)+u(i,j-1)-4*u(i,j));
+            D = (nutot/h^2)*(u(i+1,j)+u(i-1,j)+u(i,j+1)+u(i,j-1)-4*u(i,j));
             
             ut(i,j)=u(i,j)+dt*(-A+D);
             
@@ -307,14 +308,14 @@ function [ut, vt] = AdvectionDiffusion2D( ut, vt, u, v, nx, ny, h, dt, nu)
     for i=2:nx+1
         for j=2:ny 
             
-            % [TBC]
+            nutot = nu + nut(i,j);
             
             vn2 = 0.25*( v(i,j+1)+v(i,j) )^2;
             vs2 = 0.25*( v(i,j)+v(i,j-1) )^2;
             veu = 0.25*( u(i,j+1)+u(i,j) )*( v(i+1,j)+v(i,j) );
             vwu = 0.25*( u(i-1,j+1)+u(i-1,j) )*( v(i,j)+v(i-1,j) );
             A = (vn2 - vs2 + veu - vwu)/h;
-            D = (nu/h^2)*(v(i+1,j)+v(i-1,j)+v(i,j+1)+v(i,j-1)-4*v(i,j));
+            D = (nutot/h^2)*(v(i+1,j)+v(i-1,j)+v(i,j+1)+v(i,j-1)-4*v(i,j));
             
             vt(i,j)=v(i,j)+dt*(-A+D);
             
@@ -331,11 +332,19 @@ function nut = TurbulentViscosity( kappa, nx, ny, h)
     % Constants
     Cmu = 0.09;
 
+    L = nx*h;
     nut = zeros(nx+2,ny+2);
     for i=2:nx+1
         for j=2:ny+1
 
-            % [TBC]
+            x = (i-3/2)*h;
+            y = (j-3/2)*h;
+            lx = min (x, L-x);
+            ly = min (y, L-y);
+            lw = min (lx, ly);
+
+            l = Cmu*lw;
+            nut(i,j) = sqrt(max(kappa(i,j),0.)) * l;
 
         end
     end
@@ -355,11 +364,14 @@ function [kappa] = AdvectionDiffusion2DTurbulentKineticEnergy( kappa, u, v, nx, 
     kappao = kappa;
     for i=2:nx+1
             for j=2:ny+1
-                
+
                 % Distance from the wall
-                dx = (i-2)*h + h/2;
-                dy = (j-2)*h + h/2;
-                lw = min(dx,dy);
+                L = nx*h;
+                x = (i-3/2)*h;
+                y = (j-3/2)*h;
+                lx = min (x, L-x);
+                ly = min (y, L-y);
+                lw = min (lx, ly);
                 
                 % Total viscosity
                 nutot = nu + nut(i,j)/sigmak;
@@ -402,17 +414,27 @@ function [kappa] = AdvectionDiffusion2DTurbulentKineticEnergy( kappa, u, v, nx, 
                 dkappa_dy_s = (kappao(i,j)-kappao(i,j-1))/h;
                 
                 % Convection and diffusion contributions
-                convection = % [TBC]
+                convection = ue*kappae*h -uw*kappaw*h + ...
+                             vn*kappan*h -vs*kappas*h ;
                          
-                diffusion = % [TBC]
+                diffusion = nutote*dkappa_dx_e*h -nutotw*dkappa_dx_w*h + ...
+                            nutotn*dkappa_dy_n*h -nutots*dkappa_dy_s*h ; 
                                  
                 % Production term: P=nut*S^2
                 %                  S = sqrt(2*Sij*Sij)
-                %                  Sij = 1/2*(dvi/dxj+dvj/dxi)
-                % [TBC]
+                %                  Sij = 1/2*(dvi/dxj+dvj/dxi)            
+                du_over_dx = (ue-uw)/h;
+                dv_over_dy = (vn-vs)/h;
+                du_over_dy = (un-us)/h;
+                dv_over_dx = (ve-vw)/h;
+                Sxx = 1/2*(du_over_dx + du_over_dx);
+                Sxy = 1/2*(du_over_dy + dv_over_dx);
+                Syy = 1/2*(dv_over_dy + dv_over_dy);
+                S2 = 2*(Sxx^2 + 2*Sxy^2 + Syy^2);
+                P = (nu+nut(i,j))*S2;
                 
                 % Dissipation term: D=CD*k^(3/2)/l (where l=0.09*lw)
-                D = % [TBC]
+                D = CD * (max(kappa(i,j),0))^1.5 / (Cmu*lw);
                  
                 % Euler method
                 kappa(i,j)= kappao(i,j) + dt/h^2 *( -convection + diffusion ) + dt*(P-D);
@@ -420,4 +442,6 @@ function [kappa] = AdvectionDiffusion2DTurbulentKineticEnergy( kappa, u, v, nx, 
             end
     end
 
+    max(max(P))
+    max(max(D))
 end
