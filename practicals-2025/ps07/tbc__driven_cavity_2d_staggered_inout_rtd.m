@@ -121,10 +121,13 @@ for is=1:nsteps
     % ----------------------------------------------------------------------- %
 
     % [TRACER] Boundary conditions (zero-gradient)
-    % [TBC]
+    phi(:,1) = phi(:,2);       % south
+    phi(:,nx+2) = phi(:,nx+1); % north
+    phi(1,:) = phi(2,:);       % west
+    phi(nx+2,:) = phi(nx+1,:); % east
     
     % [TRACER] Boundary conditions at inlet section (Dirichlet)
-    % [TBC]
+    phi(1,nin_start:nin_end) = 2*phi_inlet - phi(2,nin_start:nin_end);
 
     % [TRACER] Update passive tracer solution (tracer behaves like a passive scalar)
     phi = AdvectionDiffusion2DPassiveScalar( phi, u, v, nx, ny, h, dt, alpha );
@@ -149,8 +152,11 @@ for is=1:nsteps
                                     phi(1:nx+1,2:ny+2)+phi(2:nx+2,2:ny+2));
 
         % Outlet value
-        % [TBC]
-        
+        phiout = mean(phi(nx+1,nout_start:nout_end));
+        E = (phiout - phiout_old) / dt;
+        phiout_old = phiout; 
+        Area = Area + E*dt;
+
         % Print on the screen
         fprintf( 'Step: %d - Time: %f - PhiOut: %f - Area: %f\n', ...
                  is, t, phiout, Area);
